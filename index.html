@@ -38,6 +38,29 @@ nav{position:sticky;top:0;z-index:100;background:rgba(245,247,250,.94);backdrop-
 .nav-btn{border:none;background:transparent;color:var(--sub);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;padding:6px 10px;border-radius:8px}
 .nav-btn.primary{background:var(--accent);color:#fff;padding:7px 14px}
 .screen{display:none;padding:16px 16px 100px;max-width:800px;margin:0 auto}
+.form-grid-2x2{display:block}
+@media(min-width:900px){
+  .form-grid-2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:16px}
+  .fg-r1c1{grid-column:1;grid-row:1}
+  .fg-r1c2{grid-column:2;grid-row:1}
+  .fg-r2c1{grid-column:1;grid-row:2;display:flex;flex-direction:column;gap:14px}
+  .fg-r2c2{grid-column:2;grid-row:2;display:flex;flex-direction:column;gap:14px}
+  .form-grid-2x2 .section-block{margin-bottom:0}
+}
+
+.form-pair-col{min-width:0}
+@media(min-width:900px){
+}
+@media(min-width:900px){
+  .screen{max-width:none;padding:24px 40px 60px}
+  .screen.active{max-width:none}
+  #tab-bar{height:52px;max-width:none}
+  .section-block{max-width:none}
+  .field-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .form-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
+  .form-sketch-col{position:sticky;top:0;grid-column:2;grid-row:1/99}
+  .form-fields-col{grid-column:1;min-width:0}
+}
 .screen.active{display:block}
 .page-title{font-size:22px;font-weight:700;margin-bottom:4px}
 .page-sub{font-size:14px;color:var(--sub);margin-bottom:20px}
@@ -65,6 +88,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(245,247,250,.94);backdrop-
 .back-btn{border:none;background:transparent;color:var(--accent);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;padding:4px 0}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 .field-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+@media(min-width:900px){
+  .field-cards{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .field-card{display:flex;flex-direction:column;gap:0}
+}
 .field-card{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px}
 .field-card-title{font-size:10px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:.5px}
 .field-card .field{margin-bottom:6px}
@@ -201,8 +228,12 @@ canvas{width:100%;display:block}
     </div>
   </div>
 
+  <!-- FORM 2x2 GRID -->
+  <div class="form-grid-2x2">
+    <!-- Row 1, Col 1: Regalrahmen -->
+    <div class="fg-r1c1">
   <!-- REGALRAHMEN -->
-  <div class="section-block">
+  <div class="section-block" style="height:100%;box-sizing:border-box">
     <div class="section-label">1 · Regalrahmen (Ständer)</div>
     <div class="field-grid">
       <div class="field"><label>Regaltyp</label>
@@ -215,7 +246,27 @@ canvas{width:100%;display:block}
       <div class="field field-full"><label>Bemerkungen Ständer</label><textarea id="p-stuetze-dicke" rows="2" placeholder="z.B. Schäden, Auffälligkeiten..."></textarea></div>
     </div>
   </div>
-
+    </div>
+    <!-- Row 1, Col 2: Optionen -->
+    <div class="fg-r1c2">
+  <!-- OPTIONEN -->
+  <div class="section-block" style="height:100%;box-sizing:border-box">
+    <div class="section-label">4 · Optionen</div>
+    <div class="field-grid">
+      <div class="field field-full">
+        <label>Eckschützer – Position wählen (Mehrfachauswahl)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+          <button id="eck-vl" onclick="toggleEck('vl')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Vorne Links</button>
+          <button id="eck-vr" onclick="toggleEck('vr')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Vorne Rechts</button>
+          <button id="eck-hl" onclick="toggleEck('hl')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Hinten Links</button>
+          <button id="eck-hr" onclick="toggleEck('hr')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Hinten Rechts</button>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+    <!-- Row 2, Col 1: Traversen + Felder -->
+    <div class="fg-r2c1">
   <!-- TRAVERSEN -->
   <div class="section-block">
     <div class="section-label">2 · Traversen (Holme)</div>
@@ -228,7 +279,9 @@ canvas{width:100%;display:block}
       <div class="field field-full"><label>Bemerkungen Traverse</label><textarea id="p-traverse-dicke" rows="2" placeholder="z.B. Schäden, Auffälligkeiten..."></textarea></div>
     </div>
   </div>
-
+    </div>
+    <!-- Row 2, Col 2: Regalfach -->
+    <div class="fg-r2c2">
   <!-- REGALFACH -->
   <div class="section-block" id="regelm-block">
     <div class="section-label">3 · Regalfach (Ebene)</div>
@@ -248,31 +301,7 @@ canvas{width:100%;display:block}
         </div>
       </div>
     </div>
-    <div id="regelm-hint" style="margin-top:10px;font-size:12px;color:var(--sub);display:none">↓ Trage unten bei jedem Feld die individuellen Masse ein.</div>
   </div>
-
-  <!-- OPTIONEN -->
-  <div class="section-block">
-    <div class="section-label">4 · Optionen</div>
-    <div class="field-grid">
-      <div class="field field-full">
-        <label>Eckschützer – Position wählen (Mehrfachauswahl)</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-          <button id="eck-vl" onclick="toggleEck('vl')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Vorne Links</button>
-          <button id="eck-vr" onclick="toggleEck('vr')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Vorne Rechts</button>
-          <button id="eck-hl" onclick="toggleEck('hl')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Hinten Links</button>
-          <button id="eck-hr" onclick="toggleEck('hr')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Hinten Rechts</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PER-FELD -->
-  <div class="section-block" id="per-feld-block">
-    <div class="section-label" id="per-feld-label">Felder</div>
-    <div class="field-cards" id="field-cards"></div>
-  </div>
-
 
   <!-- GESAMTSYSTEM -->
   <div class="section-block">
@@ -282,6 +311,14 @@ canvas{width:100%;display:block}
     </div>
     <div id="gs-results" style="margin-top:12px"></div>
     <div id="gs-warnings" style="margin-top:8px"></div>
+  </div>
+    </div>
+  </div>
+
+  <!-- PER-FELD (volle Breite) -->
+  <div class="section-block" id="per-feld-block">
+    <div class="section-label" id="per-feld-label">Felder</div>
+    <div class="field-cards" id="field-cards"></div>
   </div>
 
   <!-- PROFILE STREBEN -->
@@ -662,13 +699,12 @@ function switchTab(tab){
     const active=t===tab;
     btn.style.color=active?'var(--accent)':'var(--sub)';
     btn.style.borderTopColor=active?'var(--accent)':'transparent';
+    btn.style.borderLeftColor=active?'var(--accent)':'transparent';
   });
   if(tab==='aufnahmen'){document.getElementById('screen-list').classList.add('active');renderList();}
   if(tab==='inspektion'){
     document.getElementById('screen-inspektion-list').classList.add('active');
-    const isKunde=currentUser?.rolle==='kunde';
-
-    renderInspList();
+    renderInspKundenList();
   }
   if(tab==='kontrolle'){document.getElementById('screen-kontrolle-list').classList.add('active');renderKontrolleList();}
   if(tab==='einstellungen'){document.getElementById('screen-einstellungen').classList.add('active');renderSettings();}
@@ -1027,6 +1063,174 @@ function newInspektion(){
   renderChecklistForm();
   clearSig();
   showScreen('insp-form');
+}
+
+// ── INSPEKTION KUNDEN / RÄUME / REIHEN ───────────────────
+let inspKunden = [];
+try{inspKunden = JSON.parse(localStorage.getItem('nm_insp_kunden')||'[]');}catch(e){}
+let activeKundeId = null;
+let activeRaumId = null;
+
+function saveInspKundenData(){localStorage.setItem('nm_insp_kunden', JSON.stringify(inspKunden));}
+
+function saveInspKunde(){
+  const name = gv('ik-name').trim();
+  if(!name){toast('Name erforderlich','#dc2626');return;}
+  const k = {
+    id: uid(),
+    name,
+    kontakt: gv('ik-kontakt'),
+    adresse: gv('ik-adresse'),
+    raeume: [],
+    createdAt: new Date().toISOString().split('T')[0]
+  };
+  inspKunden.unshift(k);
+  saveInspKundenData();
+  sv('ik-name','');sv('ik-kontakt','');sv('ik-adresse','');
+  toast('Kunde gespeichert ✓');
+  switchTab('inspektion');
+}
+
+function renderInspKundenList(){
+  const el = document.getElementById('insp-kunden-list');
+  if(!el) return;
+  if(!inspKunden.length){
+    el.innerHTML = '<p style="color:var(--sub);text-align:center;padding:30px;font-size:14px">Noch keine Kunden. Klicke auf "+ Neuer Kunde".</p>';
+    return;
+  }
+  el.innerHTML = inspKunden.map(k => `
+    <div class="entry-card" onclick="openKunde('${k.id}')">
+      <div class="entry-title">${k.name}</div>
+      <div class="entry-sub">${k.kontakt||''}${k.adresse?' · '+k.adresse:''}</div>
+      <div class="entry-badges">
+        <span class="badge">${k.raeume?.length||0} Räume</span>
+        <span class="badge">${(k.raeume||[]).reduce((a,r)=>a+(r.reihen?.length||0),0)} Reihen</span>
+      </div>
+    </div>`).join('');
+}
+
+function openKunde(id){
+  const k = inspKunden.find(x=>x.id===id);
+  if(!k) return;
+  activeKundeId = id;
+  const title = document.getElementById('insp-kunde-detail-title');
+  if(title) title.textContent = k.name;
+  renderRaeumeList(k);
+  showScreen('insp-kunde-detail');
+}
+
+function backToKundeDetail(){
+  if(activeKundeId) openKunde(activeKundeId);
+}
+
+function showAddRaum(){
+  document.getElementById('add-raum-form').style.display='block';
+  sv('nr-name','');sv('nr-bem','');
+}
+
+function saveRaum(){
+  const name = gv('nr-name').trim();
+  if(!name){toast('Raumname erforderlich','#dc2626');return;}
+  const k = inspKunden.find(x=>x.id===activeKundeId);
+  if(!k) return;
+  if(!k.raeume) k.raeume = [];
+  k.raeume.push({id:uid(), name, bem:gv('nr-bem'), reihen:[]});
+  saveInspKundenData();
+  document.getElementById('add-raum-form').style.display='none';
+  renderRaeumeList(k);
+  toast('Raum gespeichert ✓');
+}
+
+function deleteRaum(raumId){
+  if(!confirm('Raum löschen?')) return;
+  const k = inspKunden.find(x=>x.id===activeKundeId);
+  if(!k) return;
+  k.raeume = k.raeume.filter(r=>r.id!==raumId);
+  saveInspKundenData();
+  renderRaeumeList(k);
+  toast('Raum gelöscht','#dc2626');
+}
+
+function renderRaeumeList(k){
+  const el = document.getElementById('insp-raeume-list');
+  if(!el) return;
+  if(!k.raeume?.length){
+    el.innerHTML='<p style="color:var(--sub);font-size:13px">Noch keine Räume. Klicke auf "+ Raum".</p>';
+    return;
+  }
+  el.innerHTML = k.raeume.map(r=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;cursor:pointer" onclick="openRaum('${r.id}')">
+        <div style="font-size:14px;font-weight:600">${r.name}</div>
+        <div style="font-size:12px;color:var(--sub)">${r.bem||''}${r.reihen?.length?' · '+r.reihen.length+' Reihen':' · Keine Reihen'}</div>
+      </div>
+      <button onclick="openRaum('${r.id}')" class="btn btn-ghost" style="padding:7px 12px;font-size:13px">→ Öffnen</button>
+      <button onclick="deleteRaum('${r.id}')" style="border:none;background:transparent;color:var(--red);font-size:18px;cursor:pointer">×</button>
+    </div>`).join('');
+}
+
+function openRaum(raumId){
+  const k = inspKunden.find(x=>x.id===activeKundeId);
+  if(!k) return;
+  const r = k.raeume.find(x=>x.id===raumId);
+  if(!r) return;
+  activeRaumId = raumId;
+  const title = document.getElementById('insp-raum-detail-title');
+  if(title) title.textContent = k.name+' · '+r.name;
+  renderReihenList(r);
+  showScreen('insp-raum-detail');
+}
+
+function showAddReihe(){
+  document.getElementById('add-reihe-form').style.display='block';
+  sv('rr-nr','');sv('rr-bem','');sv('rr-felder','');sv('rr-ebenen','');
+}
+
+function saveReihe(){
+  const nr = gv('rr-nr').trim();
+  if(!nr){toast('Reihen-Nr. erforderlich','#dc2626');return;}
+  const k = inspKunden.find(x=>x.id===activeKundeId);
+  const r = k?.raeume?.find(x=>x.id===activeRaumId);
+  if(!r) return;
+  if(!r.reihen) r.reihen = [];
+  r.reihen.push({
+    id:uid(), nr, typ:document.getElementById('rr-typ')?.value||'',
+    felder:gv('rr-felder'), ebenen:gv('rr-ebenen'), bem:gv('rr-bem'),
+    inspektionen:[]
+  });
+  saveInspKundenData();
+  document.getElementById('add-reihe-form').style.display='none';
+  renderReihenList(r);
+  toast('Reihe gespeichert ✓');
+}
+
+function deleteReihe(reiheId){
+  if(!confirm('Reihe löschen?')) return;
+  const k = inspKunden.find(x=>x.id===activeKundeId);
+  const r = k?.raeume?.find(x=>x.id===activeRaumId);
+  if(!r) return;
+  r.reihen = r.reihen.filter(x=>x.id!==reiheId);
+  saveInspKundenData();
+  renderReihenList(r);
+  toast('Reihe gelöscht','#dc2626');
+}
+
+function renderReihenList(r){
+  const el = document.getElementById('insp-reihen-list');
+  if(!el) return;
+  if(!r.reihen?.length){
+    el.innerHTML='<p style="color:var(--sub);font-size:13px">Noch keine Reihen. Klicke auf "+ Reihe".</p>';
+    return;
+  }
+  el.innerHTML = r.reihen.map(re=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600">Reihe ${re.nr}</div>
+        <div style="font-size:12px;color:var(--sub)">${re.typ||'—'}${re.felder?' · '+re.felder+' Felder':''}${re.ebenen?' · '+re.ebenen+' Ebenen':''}</div>
+        ${re.bem?`<div style="font-size:11px;color:var(--sub);margin-top:2px">${re.bem}</div>`:''}
+      </div>
+      <button onclick="deleteReihe('${re.id}')" style="border:none;background:transparent;color:var(--red);font-size:18px;cursor:pointer">×</button>
+    </div>`).join('');
 }
 
 function renderInspList(){
@@ -2818,12 +3022,7 @@ window.addEventListener('resize',()=>{if(document.getElementById('screen-form').
 <!-- INSPEKTION LIST -->
 <div class="screen" id="screen-inspektion-list">
 
-  <!-- BAUSTELLE: entfernbar -->
-  <div id="banner-baustelle-inspektion" style="background:#fef3c7;border:1px solid #f59e0b;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
-    <span style="font-size:22px">🚧</span>
-    <span style="font-size:13px;color:#92400e;font-weight:600">Dieses Modul ist noch in Entwicklung</span>
-  </div>
-  <!-- /BAUSTELLE -->
+
   <p class="page-title" id="insp-page-title">Inspektionen</p>
   <p class="page-sub">Regalinspektionen & Prüfberichte</p>
   <button class="btn btn-accent" onclick="newInspektion()" style="width:100%;margin-bottom:16px">+ Neue Inspektion starten</button>
