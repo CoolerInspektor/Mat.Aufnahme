@@ -105,6 +105,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(245,247,250,.94);backdrop-
 .at-type-btn:hover{background:rgba(0,0,205,0.06);border-color:var(--accent)}
 canvas{width:100%;display:block}
 .sketch-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px 12px}
+.sk-tb-btn{padding:3px 9px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--sub);font-size:10px;cursor:pointer;font-family:inherit;transition:all .12s;white-space:nowrap}
+.sk-tb-btn.active{border-color:var(--accent);background:rgba(37,99,235,0.08);color:var(--accent);font-weight:600}
+.sk-tb-btn:hover:not(.active){background:var(--bg)}
 .form-layout{display:block}
 .form-sketch-col{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:800px;z-index:150;background:var(--bg);padding:0}
 .form-sketch-col .sketch-wrap{border-radius:0;border-left:none;border-right:none;border-top:none;border-bottom:2px solid var(--accent);box-shadow:0 3px 12px rgba(0,0,0,0.15);margin:0}
@@ -301,42 +304,45 @@ canvas{width:100%;display:block}
 <div class="screen" id="screen-ersatzteile-form">
   <div class="form-header">
     <button class="back-btn" onclick="showScreen('ersatzteile-list')">← Zurück</button>
-    <span style="font-size:15px;font-weight:700" id="ersatzteil-form-title">Neues Ersatzteil</span>
+    <span style="font-size:15px;font-weight:700">Ersatzteile erfassen</span>
   </div>
+  <!-- Standort -->
   <div class="section-block">
-    <div class="section-label">Angaben</div>
+    <div class="section-label">Standort</div>
     <div class="field-grid">
       <div class="field"><label>Kunde / Lager</label><input type="text" id="et-kunde" placeholder="z.B. Migros Lager 3"></div>
       <div class="field"><label>Reihen-Nr.</label><input type="text" id="et-reihe" placeholder="z.B. A-01"></div>
       <div class="field"><label>Datum</label><input type="date" id="et-datum"></div>
       <div class="field"><label>Erfasser</label><input type="text" id="et-erfasser" placeholder="Name"></div>
-      <div class="field"><label>Bauteil</label>
-        <select id="et-typ">
-          <option value="">Bitte wählen</option>
-          <option>Ständer / Rahmen</option>
-          <option>Traverse / Holm</option>
-          <option>Einlegeboden</option>
-          <option>Sicherungsbolzen</option>
-          <option>Fussplatte</option>
-          <option>Diagonalstrebe</option>
-          <option>Horizontalstrebe</option>
-          <option>Eckschutz</option>
-          <option>Sonstiges</option>
-        </select>
-      </div>
-      <div class="field"><label>Hersteller / Typ</label><input type="text" id="et-hersteller" placeholder="z.B. Dexion T5"></div>
-      <div class="field"><label>Anzahl benötigt</label><input type="number" id="et-anzahl" placeholder="z.B. 2" min="1"></div>
-      <div class="field"><label>Priorität</label>
-        <select id="et-prioritaet">
-          <option value="">Bitte wählen</option>
-          <option>Dringend – sofort</option>
-          <option>Hoch – diese Woche</option>
-          <option>Normal – nächster Service</option>
-          <option>Niedrig – beobachten</option>
-        </select>
-      </div>
-      <div class="field field-full"><label>Bemerkungen / Masse</label><textarea id="et-bemerkung" rows="2" placeholder="z.B. Rahmenhöhe 4500mm, Breite 80mm..."></textarea></div>
     </div>
+  </div>
+  <!-- Typ-Buttons -->
+  <div class="section-block">
+    <div class="section-label">Bauteil wählen</div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px">
+      <button class="at-typ-btn" onclick="addETItem('Traverse')">+ Traverse</button>
+      <button class="at-typ-btn" onclick="addETItem('Stützenrahmen')">+ Stützenrahmen</button>
+      <button class="at-typ-btn" onclick="addETItem('Einzelstütze')">+ Einzelstütze</button>
+      <button class="at-typ-btn" onclick="addETItem('Diagonalstrebe')">+ Diagonalstrebe</button>
+      <button class="at-typ-btn" onclick="addETItem('Horizontalstrebe')">+ Horizontalstrebe</button>
+      <button class="at-typ-btn" onclick="addETItem('Kleinteile')">+ Kleinteile</button>
+    </div>
+  </div>
+  <!-- Items -->
+  <div class="section-block">
+    <div id="et-items-empty" style="color:var(--sub);font-size:13px;text-align:center;padding:20px 0">Noch keine Bauteile hinzugefügt.</div>
+    <div id="et-items-list"></div>
+  </div>
+  <!-- Priorität + Fotos -->
+  <div class="section-block">
+    <div class="section-label">Priorität</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button class="et-prio-btn" data-prio="Dringend – sofort" onclick="setETPrio(this)" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;background:transparent;color:var(--red);cursor:pointer">🔴 Dringend</button>
+      <button class="et-prio-btn" data-prio="Hoch – diese Woche" onclick="setETPrio(this)" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;background:transparent;color:#b45309;cursor:pointer">🟠 Hoch</button>
+      <button class="et-prio-btn" data-prio="Normal – nächster Service" onclick="setETPrio(this)" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;background:transparent;color:var(--accent);cursor:pointer">🔵 Normal</button>
+      <button class="et-prio-btn" data-prio="Niedrig – beobachten" onclick="setETPrio(this)" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;background:transparent;color:var(--sub);cursor:pointer">⚪ Niedrig</button>
+    </div>
+    <input type="hidden" id="et-prioritaet" value="">
   </div>
   <div class="section-block">
     <div class="section-label">Fotos</div>
@@ -372,9 +378,41 @@ canvas{width:100%;display:block}
 
   <div class="form-layout">
     <div class="form-sketch-col">
-      <div class="sketch-wrap">
-        <div class="sketch-title">Skizze (live · 3D)</div>
-        <canvas id="regal-sketch" style="width:100%;height:200px;display:block"></canvas>
+      <div class="sketch-wrap" style="padding:0;overflow:hidden">
+        <!-- Toolbar -->
+        <div id="sk-toolbar" style="display:flex;align-items:center;gap:5px;padding:7px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--bg2)">
+          <span style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.04em;margin-right:2px">ANSICHT</span>
+          <button class="sk-tb-btn active" id="sk-iso-btn" onclick="setSketchView('iso',this)">ISO 3D</button>
+          <button class="sk-tb-btn" id="sk-2d-btn" onclick="setSketchView('2d',this)">2D Front</button>
+          <div style="width:1px;height:14px;background:var(--border);flex-shrink:0;margin:0 2px"></div>
+          <span style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.04em;margin-right:2px">HÖHE</span>
+          <button class="sk-tb-btn active" id="sk-auto-btn" onclick="setSketchH('auto',this)">Auto</button>
+          <button class="sk-tb-btn" id="sk-compact-btn" onclick="setSketchH('compact',this)">Kompakt</button>
+          <button class="sk-tb-btn" id="sk-tall-btn" onclick="setSketchH('tall',this)">Gross</button>
+          <div style="flex:1"></div>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:10px;color:var(--sub);margin-right:4px">
+            <input type="checkbox" id="sk-show-cb" checked onchange="toggleSketchVisible(this.checked)" style="cursor:pointer">
+            Vorschau
+          </label>
+          <button class="sk-tb-btn" onclick="openSketchOverlay()" style="padding:4px 8px">⤢</button>
+        </div>
+        <!-- Canvas wrap -->
+        <div id="sk-canvas-wrap" style="overflow:hidden;transition:height .2s ease">
+          <canvas id="regal-sketch" style="width:100%;display:block"></canvas>
+        </div>
+      </div>
+
+      <!-- Fullscreen Overlay -->
+      <div id="sk-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px">
+        <div style="background:var(--bg);border-radius:16px;overflow:hidden;width:100%;max-width:920px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+          <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)">
+            <span style="font-size:14px;font-weight:700;color:var(--text);flex:1">Regalskizze</span>
+            <button onclick="closeSketchOverlay()" style="background:transparent;border:none;font-size:22px;cursor:pointer;color:var(--sub);line-height:1;padding:0 4px">×</button>
+          </div>
+          <div style="flex:1;overflow:auto;padding:16px">
+            <canvas id="regal-sketch-overlay" style="width:100%;display:block"></canvas>
+          </div>
+        </div>
       </div>
     </div>
     <div class="form-fields-col">
@@ -475,6 +513,15 @@ canvas{width:100%;display:block}
     <div id="gs-warnings" style="margin-top:8px"></div>
   </div>
     </div>
+  </div>
+
+  <!-- ABSCHNITTE -->
+  <div class="section-block" id="abschnitte-block">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="section-label" style="margin-bottom:0">Reihenabschnitte</div>
+      <button class="btn btn-ghost" onclick="addAbschnitt()" style="font-size:12px;padding:6px 12px">+ Abschnitt teilen</button>
+    </div>
+    <div id="abschnitte-list" style="display:flex;flex-direction:column;gap:6px"></div>
   </div>
 
   <!-- PER-FELD (volle Breite) -->
@@ -592,6 +639,130 @@ canvas{width:100%;display:block}
 </div>
 
 <script>
+// ══════════════════════════════════════════════════════════
+// INDEXEDDB – Kompletter App-Datenspeicher
+// Stores: 'data' (JSON-Daten) + 'photos' (Bilder)
+// ══════════════════════════════════════════════════════════
+const IDB_NAME='NeziDesk',IDB_VER=2;
+let idb=null;
+
+function openIDB(){
+  return new Promise((res,rej)=>{
+    if(idb){res(idb);return;}
+    const req=indexedDB.open(IDB_NAME,IDB_VER);
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('photos'))
+        db.createObjectStore('photos',{keyPath:'key'});
+      if(!db.objectStoreNames.contains('data'))
+        db.createObjectStore('data',{keyPath:'key'});
+    };
+    req.onsuccess=e=>{idb=e.target.result;res(idb);};
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+
+// ── Generische IDB Helfer ─────────────────────────────────
+async function idbPut(store,key,value){
+  const db=await openIDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(store,'readwrite');
+    tx.objectStore(store).put({key,value});
+    tx.oncomplete=()=>res();tx.onerror=e=>rej(e.target.error);
+  });
+}
+async function idbGet(store,key){
+  const db=await openIDB();
+  return new Promise((res,rej)=>{
+    const req=db.transaction(store,'readonly').objectStore(store).get(key);
+    req.onsuccess=e=>res(e.target.result?.value??null);
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+async function idbDel(store,key){
+  const db=await openIDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(store,'readwrite');
+    tx.objectStore(store).delete(key);
+    tx.oncomplete=()=>res();tx.onerror=e=>rej(e.target.error);
+  });
+}
+
+// ── Data store: ersetzt localStorage für alle App-Daten ───
+async function idbSave(key,obj){
+  try{await idbPut('data',key,obj);}
+  catch(e){
+    // Fallback zu localStorage
+    try{localStorage.setItem(key,JSON.stringify(obj));}catch(_){}
+  }
+}
+async function idbLoad(key,fallback){
+  try{
+    const v=await idbGet('data',key);
+    if(v!==null)return v;
+  }catch(_){}
+  // Fallback: lies aus localStorage (Migration)
+  try{
+    const ls=localStorage.getItem(key);
+    if(ls){
+      const parsed=JSON.parse(ls);
+      // Migriere zu IDB
+      idbSave(key,parsed).then(()=>localStorage.removeItem(key)).catch(()=>{});
+      return parsed;
+    }
+  }catch(_){}
+  return fallback;
+}
+
+// ── Photo store ───────────────────────────────────────────
+async function savePhotosToIDB(prefix,photosArr){
+  const keys=[];
+  for(let i=0;i<photosArr.length;i++){
+    const p=photosArr[i];
+    if(p&&p.startsWith('data:')){
+      const k=prefix+'_'+i+'_'+Math.random().toString(36).slice(2);
+      await idbPut('photos',k,p);
+      keys.push('idb:'+k);
+    } else if(p){keys.push(p);}
+  }
+  return keys;
+}
+async function loadPhotosFromIDB(keys){
+  const result=[];
+  for(const k of(keys||[])){
+    if(k&&k.startsWith('idb:')){
+      const d=await idbGet('photos',k.slice(4));
+      if(d)result.push(d);
+    } else if(k&&k.startsWith('data:')){result.push(k);}
+  }
+  return result;
+}
+async function deletePhotosFromIDB(keys){
+  for(const k of(keys||[])){
+    if(k&&k.startsWith('idb:'))await idbDel('photos',k.slice(4)).catch(()=>{});
+  }
+}
+
+// ── App initialisieren: Daten aus IDB laden ───────────────
+async function initAppData(){
+  entries=await idbLoad('regal_entries',[]);
+  anbauteile=await idbLoad('nm_anbauteile',[]);
+  ersatzteile=await idbLoad('nm_ersatzteile',[]);
+  kontrollen=await idbLoad('nm_kontrollen',[]);
+  inspektionen=await idbLoad('nm_inspektionen',[]);
+  inspKunden=await idbLoad('nm_insp_kunden',[]);
+  const s=await idbLoad('nm_settings',null);
+  if(s){
+    settings=s;
+    if(settings.pruefpunkte)pruefpunkte=[...settings.pruefpunkte];
+    if(settings.kontrollpunkte)kontrollpunkte=[...settings.kontrollpunkte];
+    if(settings.logo)document.documentElement.style.setProperty('--logo',`url(${settings.logo})`);
+  }
+  renderList();
+}
+
+// ══════════════════════════════════════════════════════════
+// INDEXEDDB – Kompletter App-Datenspeicher
 // ── STATE ───────────────────────────────────────────────
 // ── THEME SYSTEM ─────────────────────────────────────────
 let theme={accent:'#0000cd',font:'Inter',density:'normal',mode:'auto',logo:null};
@@ -618,7 +789,7 @@ function applyTheme(){
   }
 }
 
-function saveTheme(){localStorage.setItem('nm_theme',JSON.stringify(theme));applyTheme();}
+function saveTheme(){idbSave('nm_theme',theme);applyTheme();}
 
 function setAccentColor(color){
   theme.accent=color;saveTheme();
@@ -723,7 +894,7 @@ function getUsers(){
     return u||DEFAULT_USERS;
   }catch(e){return DEFAULT_USERS;}
 }
-function saveUsers(users){localStorage.setItem('nm_users',JSON.stringify(users));}
+function saveUsers(users){idbSave('nm_users',users);}
 
 function doLogin(){
   const user=document.getElementById('login-user')?.value?.trim().toLowerCase();
@@ -791,15 +962,17 @@ function deleteUser(id){
 
 // ── STATE ──────────────────────────────────────────────────
 let entries=[];
-try{entries=JSON.parse(localStorage.getItem('regal_entries')||'[]');}catch(e){entries=[];}
+// Data loaded via initAppData()
 let currentPhotos=[],editingId=null,viewingId=null;
 let toggleState={anbau:null};
 const eckSet=new Set();
 let regelmaessig=true;
+let regalAbschnitte=[];
+let globalBauteile={einlagen:[],rwg:false,rwgVon:'',rwgBis:'',dsv:false,dsvVon:'',dsvBis:''};
 const dsvState={};
 
 // ── HELPERS ──────────────────────────────────────────────
-function save(){try{localStorage.setItem('regal_entries',JSON.stringify(entries));}catch(e){}}
+function save(){idbSave('regal_entries',entries).catch(e=>toast('Speichern fehlgeschlagen: '+e.message,'#dc2626'));}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 function toast(msg,col){const t=document.getElementById('toast');t.textContent=msg;t.style.background=col||'var(--green)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 function fmt(v,u){return(v!==''&&v!=null&&v!==undefined&&v!=='?')?v+(u||''):'—';}
@@ -872,18 +1045,29 @@ function applyRegelm(){
   document.getElementById('regelm-ja').className='regelm-btn'+(regelmaessig?' active':'');
   document.getElementById('regelm-nein').className='regelm-btn'+(!regelmaessig?' active':'');
   const hint=document.getElementById('regelm-hint');
-  if(hint)hint.style.display=regelmaessig?'none':'block';
+  // When abschnitte active, individual fields are always visible - hide "Alle gleich" toggle hint
+  const forceShow=regalAbschnitte&&regalAbschnitte.length>0;
+  if(hint)hint.style.display=(forceShow||regelmaessig)?'none':'block';
   const lbl=document.getElementById('per-feld-label');
-  if(lbl)lbl.textContent=regelmaessig?'Felder':'Felder – individuelle Masse';
+  if(lbl)lbl.textContent=(forceShow||!regelmaessig)?'Felder – individuelle Masse':'Felder';
   const pfb=document.getElementById('per-feld-block');
-  if(pfb){pfb.style.borderColor=regelmaessig?'var(--border)':'var(--accent)';pfb.style.borderWidth='1.5px';}
-  const felder=parseInt(gv('f-felder'))||0;
+  if(pfb){pfb.style.borderColor=(forceShow||!regelmaessig)?'var(--accent)':'var(--border)';pfb.style.borderWidth='1.5px';}
+  const felder=getTotalFelder();
+  const showAll=forceShow||!regelmaessig;
   for(let i=0;i<felder;i++){
-    ['lw-wrap-','eb-wrap-','lh-wrap-','bauteile-wrap-'].forEach(pre=>{
+    // Feldweite + Ebenenanzahl: only show when not regelmaessig
+    ['lw-wrap-','eb-wrap-'].forEach(pre=>{
       const el=document.getElementById(pre+i);
-      if(el)el.style.display=regelmaessig?'none':'block';
+      if(el)el.style.display=showAll?'block':'none';
+    });
+    // Fachhöhen + Einlegeboden/RWG/DSV: always show
+    ['lh-wrap-','bauteile-wrap-'].forEach(pre=>{
+      const el=document.getElementById(pre+i);
+      if(el)el.style.display='block';
     });
   }
+  // Always rebuild LH inputs
+  for(let i=0;i<felder;i++) updateLHInputs(i);
 }
 
 
@@ -899,19 +1083,19 @@ function showScreen(name){
   if(name==='anbauteile-list')renderATList();
   if(name==='ersatzteile-list')renderETList();
   if(name==='anbauteile-form'){sv('at-datum',new Date().toISOString().split('T')[0]);atPhotos=[];atItems=[];renderATGrid();renderATItems();}
-  if(name==='ersatzteile-form'){sv('et-datum',new Date().toISOString().split('T')[0]);etPhotos=[];renderETGrid();}
-  if(name==='form')setTimeout(()=>{updateSketch();calcGesamtsystem();},60);
+  if(name==='ersatzteile-form'){sv('et-datum',new Date().toISOString().split('T')[0]);etPhotos=[];etItems=[];etSelectedPrio='';renderETItems();renderETGrid();}
+  if(name==='form')setTimeout(()=>{updateSketch();calcGesamtsystem();renderAbschnitte();},60);
   if(name==='insp-form')setTimeout(initSigPad,100);
   if(name==='kontrolle-form')setTimeout(initKontrolleSigPad,100);
 }
 
 // ── ANBAUTEILE ─────────────────────────────────────────────
 let anbauteile=[];
-try{anbauteile=JSON.parse(localStorage.getItem('nm_anbauteile')||'[]');}catch(e){}
+// Data loaded via initAppData()
 let atPhotos=[];
 let atItems=[]; // [{id, typ, anzahl, hersteller, bemerkung}]
 
-function saveAT(){localStorage.setItem('nm_anbauteile',JSON.stringify(anbauteile));}
+function saveAT(){idbSave('nm_anbauteile',anbauteile);}
 
 function addATItem(typ){
   atItems.push({id:uid(),typ,anzahl:'',laenge:'',breite:'',traglast:'',bemerkung:''});
@@ -1310,6 +1494,17 @@ function atItemFields(item){
     case 'Anfahrschutz':
       return stk();
 
+    case 'Diagonalstrebe':
+    case 'Horizontalstrebe':
+      return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${inp('laenge','Länge (mm)','z.B. 1100','number')}
+        ${inp('breite','Breite (mm)','z.B. 50','number')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        ${inp('hoehe','Höhe (mm)','z.B. 35','number')}
+        ${inp('lochmass','Lochmass (mm)','z.B. 50','number')}
+      </div>`;
+
     case 'Leitplanke':
       return `<div style="display:flex;flex-direction:column;gap:10px">
         ${stk()}
@@ -1384,7 +1579,8 @@ function renderATGrid(){
 function saveAnbauteil(){
   if(!atItems.length){toast('Mindestens ein Bauteil erforderlich','#dc2626');return;}
   const e={id:uid(),kunde:gv('at-kunde'),reihe:gv('at-reihe'),datum:gv('at-datum'),erfasser:gv('at-erfasser'),items:atItems.map(i=>({...i})),photos:[...atPhotos]};
-  anbauteile.unshift(e);saveAT();atItems=[];atPhotos=[];renderATItems();renderATGrid();
+  savePhotosToIDB('at_'+e.id,e.photos).then(k=>{e.photos=k;anbauteile.unshift(e);saveAT();}).catch(()=>{anbauteile.unshift(e);saveAT();});
+  atItems=[];atPhotos=[];renderATItems();renderATGrid();
   toast('Anbauteile gespeichert ✓');showScreen('anbauteile-list');renderATList();
 }
 function renderATList(){
@@ -1404,9 +1600,10 @@ function renderATList(){
 
 // ── ERSATZTEILE ─────────────────────────────────────────────
 let ersatzteile=[];
-try{ersatzteile=JSON.parse(localStorage.getItem('nm_ersatzteile')||'[]');}catch(e){}
+// Data loaded via initAppData()
 let etPhotos=[];
-function saveET(){localStorage.setItem('nm_ersatzteile',JSON.stringify(ersatzteile));}
+let etItems=[];
+function saveET(){idbSave('nm_ersatzteile',ersatzteile);}
 function handleETPhotos(ev){
   const files=Array.from(ev.target.files);
   files.forEach(f=>{const r=new FileReader();r.onload=e=>{etPhotos.push(e.target.result);renderETGrid();};r.readAsDataURL(f);});
@@ -1415,10 +1612,243 @@ function renderETGrid(){
   const g=document.getElementById('et-photo-grid');if(!g)return;
   g.innerHTML=etPhotos.map((s,i)=>`<div class="photo-thumb"><img src="${s}" style="width:100%;height:100%;object-fit:cover;border-radius:8px"><button onclick="etPhotos.splice(${i},1);renderETGrid()" style="position:absolute;top:4px;right:4px;border:none;background:rgba(0,0,0,0.5);color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1">×</button></div>`).join('');
 }
+
+// ET Sketches
+const ET_SKETCHES={
+
+  Traverse:(id)=>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 200">
+    <rect x="126" y="72" width="18" height="84" fill="#f97316" stroke="#c2410c" stroke-width="1.2"/>
+    <polygon points="126,72 144,72 156,65 138,65" fill="#fdba74" stroke="#c2410c" stroke-width="0.7"/>
+    <polygon points="144,72 156,65 156,149 144,156" fill="#ea580c" stroke="#c2410c" stroke-width="0.7"/>
+    <rect x="129" y="84" width="10" height="8" rx="1" fill="#c2410c" stroke="#9a3412" stroke-width="0.8"/>
+    <rect x="129" y="132" width="10" height="8" rx="1" fill="#c2410c" stroke="#9a3412" stroke-width="0.8"/>
+    <rect x="144" y="92" width="392" height="40" fill="#f97316" stroke="#c2410c" stroke-width="1.2"/>
+    <polygon points="144,92 536,92 548,85 156,85" fill="#fdba74" stroke="#c2410c" stroke-width="0.8"/>
+    <polygon points="536,92 548,85 548,124 536,132" fill="#ea580c" stroke="#c2410c" stroke-width="0.8"/>
+    <polygon points="144,132 536,132 548,124 156,124" fill="#c2410c" stroke="#9a3412" stroke-width="0.6"/>
+    <rect x="536" y="72" width="18" height="84" fill="#f97316" stroke="#c2410c" stroke-width="1.2"/>
+    <polygon points="536,72 554,72 566,65 548,65" fill="#fdba74" stroke="#c2410c" stroke-width="0.7"/>
+    <polygon points="554,72 566,65 566,149 554,156" fill="#ea580c" stroke="#c2410c" stroke-width="0.7"/>
+    <rect x="539" y="84" width="10" height="8" rx="1" fill="#c2410c" stroke="#9a3412" stroke-width="0.8"/>
+    <rect x="539" y="132" width="10" height="8" rx="1" fill="#c2410c" stroke="#9a3412" stroke-width="0.8"/>
+    <line x1="144" y1="170" x2="536" y2="170" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="4 3"/>
+    <line x1="144" y1="166" x2="144" y2="174" stroke="#94a3b8" stroke-width="0.8"/>
+    <line x1="536" y1="166" x2="536" y2="174" stroke="#94a3b8" stroke-width="0.8"/>
+    <text font-size="10" font-family="Arial,sans-serif" fill="#64748b" x="340" y="188" text-anchor="middle">Traversenlänge</text>
+  </svg>`,
+
+  Stützenrahmen:(id)=>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 400 300">
+    <rect x="70" y="38" width="10" height="222" fill="#2563eb" stroke="#1d4ed8" stroke-width="1"/>
+    <polygon points="80,38 100,30 100,252 80,260" fill="#1a52d4" stroke="#1d4ed8" stroke-width="0.7"/>
+    <polygon points="70,38 80,38 100,30 90,30" fill="#60a5fa" stroke="#1d4ed8" stroke-width="0.5"/>
+    <rect x="290" y="38" width="10" height="222" fill="#2563eb" stroke="#1d4ed8" stroke-width="1"/>
+    <polygon points="300,38 320,30 320,252 300,260" fill="#1a52d4" stroke="#1d4ed8" stroke-width="0.7"/>
+    <polygon points="290,38 300,38 320,30 310,30" fill="#60a5fa" stroke="#1d4ed8" stroke-width="0.5"/>
+    <rect x="80" y="250" width="210" height="7" rx="1" fill="#64748b" stroke="#475569" stroke-width="0.8"/>
+    <polygon points="290,250 300,250 300,257 290,257" fill="#475569"/>
+    <rect x="80" y="40" width="210" height="7" rx="1" fill="#64748b" stroke="#475569" stroke-width="0.8"/>
+    <polygon points="290,40 300,40 300,47 290,47" fill="#475569"/>
+    <line x1="80"  y1="257" x2="290" y2="205" stroke="#78828e" stroke-width="3" stroke-linecap="round"/>
+    <line x1="290" y1="205" x2="80"  y2="153" stroke="#78828e" stroke-width="3" stroke-linecap="round"/>
+    <line x1="80"  y1="153" x2="290" y2="101" stroke="#78828e" stroke-width="3" stroke-linecap="round"/>
+    <line x1="290" y1="101" x2="80"  y2="47"  stroke="#78828e" stroke-width="3" stroke-linecap="round"/>
+    <polygon points="58,256 82,256 100,248 76,248" fill="#374151" stroke="#1f2937" stroke-width="0.7"/>
+    <polygon points="58,256 58,263 82,263 82,256" fill="#374151"/>
+    <polygon points="278,256 302,256 320,248 296,248" fill="#374151" stroke="#1f2937" stroke-width="0.7"/>
+    <polygon points="278,256 278,263 302,263 302,256" fill="#374151"/>
+    <line x1="70" y1="278" x2="300" y2="278" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3 2"/>
+    <line x1="70" y1="274" x2="70" y2="282" stroke="#94a3b8" stroke-width="0.8"/>
+    <line x1="300" y1="274" x2="300" y2="282" stroke="#94a3b8" stroke-width="0.8"/>
+    <text font-size="10" font-family="Arial,sans-serif" fill="#64748b" x="185" y="294" text-anchor="middle">Breite</text>
+    <line x1="46" y1="38" x2="46" y2="260" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3 2"/>
+    <line x1="41" y1="38" x2="51" y2="38" stroke="#94a3b8" stroke-width="0.8"/>
+    <line x1="41" y1="260" x2="51" y2="260" stroke="#94a3b8" stroke-width="0.8"/>
+    <text font-size="10" font-family="Arial,sans-serif" fill="#64748b" x="34" y="152" text-anchor="end">H</text>
+  </svg>`,
+
+  // ── EINZELSTÜTZE – ein Ständer mit Lochprofil + Bodenplatte ──
+  Einzelstütze:(id)=>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 400 260">
+    <!-- Vorderfläche Ständer -->
+    <rect x="172" y="18" width="26" height="220" rx="2" fill="#2563eb" stroke="#1d4ed8" stroke-width="1.2"/>
+    <!-- ISO Seite -->
+    <polygon points="198,18 224,8 224,228 198,238" fill="#1a52d4" stroke="#1d4ed8" stroke-width="0.8"/>
+    <!-- ISO Oben -->
+    <polygon points="172,18 198,18 224,8 198,8" fill="#60a5fa" stroke="#1d4ed8" stroke-width="0.6"/>
+    <!-- Lochprofil (Stanzungen) -->
+    <rect x="176" y="34" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="50" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="66" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="82" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="98" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="114" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="130" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="146" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="162" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="178" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="194" width="14" height="7" rx="1" fill="#1244a8"/>
+    <rect x="176" y="210" width="14" height="7" rx="1" fill="#1244a8"/>
+    <!-- Bodenplatte -->
+    <polygon points="154,234 200,234 224,224 178,224" fill="#374151" stroke="#1f2937" stroke-width="0.8"/>
+    <polygon points="154,234 154,242 200,242 200,234" fill="#374151"/>
+    <polygon points="200,234 224,224 224,232 200,242" fill="#1f2937"/>
+    <circle cx="162" cy="238" r="3" fill="#6b7280"/>
+    <circle cx="192" cy="238" r="3" fill="#6b7280"/>
+    <!-- Masslinie Höhe -->
+    <line x1="136" y1="18" x2="136" y2="234" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3 2"/>
+    <line x1="131" y1="18" x2="141" y2="18" stroke="#94a3b8" stroke-width="0.8"/>
+    <line x1="131" y1="234" x2="141" y2="234" stroke="#94a3b8" stroke-width="0.8"/>
+    <text font-size="10" font-family="Arial,sans-serif" fill="#64748b" x="124" y="130" text-anchor="end">H</text>
+    <text font-size="10" font-family="Arial,sans-serif" fill="#64748b" x="196" y="254" text-anchor="middle">Einzelstütze</text>
+  </svg>`,
+
+  Diagonalstrebe:(id)=>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 420 180">
+    <polygon points="50,148 370,56 370,70 50,162" fill="#78828e" stroke="#475569" stroke-width="1.4"/>
+    <polygon points="64,142 384,50 384,64 64,156" fill="#64748b" stroke="#475569" stroke-width="0.8"/>
+    <polygon points="50,148 64,142 384,50 370,56" fill="#94a3b8" stroke="#475569" stroke-width="0.6"/>
+    <polygon points="50,162 64,156 384,64 370,70" fill="#475569" stroke="#334155" stroke-width="0.5"/>
+    <line x1="50" y1="172" x2="370" y2="172" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3 2"/>
+    <line x1="50" y1="168" x2="50" y2="176" stroke="#94a3b8" stroke-width="0.8"/>
+    <line x1="370" y1="168" x2="370" y2="176" stroke="#94a3b8" stroke-width="0.8"/>
+    <text font-size="10" font-family="Arial,sans-serif" fill="#64748b" x="210" y="168" text-anchor="middle">Länge</text>
+  </svg>`,
+
+  Horizontalstrebe:(id)=>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 420 130">
+    <polygon points="50,60 370,60 370,74 50,74" fill="#78828e" stroke="#475569" stroke-width="1.4"/>
+    <polygon points="64,54 384,54 384,68 64,68" fill="#64748b" stroke="#475569" stroke-width="0.8"/>
+    <polygon points="50,60 64,54 384,54 370,60" fill="#94a3b8" stroke="#475569" stroke-width="0.6"/>
+    <polygon points="50,74 64,68 384,68 370,74" fill="#475569" stroke="#334155" stroke-width="0.5"/>
+    <line x1="50" y1="92" x2="370" y2="92" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3 2"/>
+    <line x1="50" y1="88" x2="50" y2="96" stroke="#94a3b8" stroke-width="0.8"/>
+    <line x1="370" y1="88" x2="370" y2="96" stroke="#94a3b8" stroke-width="0.8"/>
+    <text font-size="10" font-family="Arial,sans-serif" fill="#64748b" x="210" y="110" text-anchor="middle">Länge</text>
+  </svg>`,
+
+  // ── KLEINTEILE – Sicherungsbolzen, Clip, Fussplatte ──
+  Kleinteile:(id)=>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 420 180">
+    <!-- Sicherungsbolzen (Sicherungsstift) -->
+    <rect x="50" y="50" width="6" height="60" rx="3" fill="#64748b" stroke="#475569" stroke-width="0.8"/>
+    <circle cx="53" cy="50" r="6" fill="#475569" stroke="#334155" stroke-width="1"/>
+    <rect x="48" y="105" width="10" height="8" rx="1" fill="#374151"/>
+    <text font-size="9" font-family="Arial,sans-serif" fill="#64748b" x="53" y="128" text-anchor="middle">Bolzen</text>
+
+    <!-- Clip / Einhänger -->
+    <path d="M130,55 Q130,45 140,45 L160,45 Q170,45 170,55 L170,75 Q170,85 160,85 L140,85 Q130,85 130,75 Z" fill="none" stroke="#475569" stroke-width="4"/>
+    <rect x="145" y="85" width="10" height="20" rx="2" fill="#64748b"/>
+    <text font-size="9" font-family="Arial,sans-serif" fill="#64748b" x="150" y="124" text-anchor="middle">Clip</text>
+
+    <!-- Fussplatte -->
+    <rect x="210" y="90" width="70" height="10" rx="2" fill="#374151" stroke="#1f2937" stroke-width="0.8"/>
+    <polygon points="210,90 280,90 290,84 220,84" fill="#4b5563" stroke="#334155" stroke-width="0.6"/>
+    <rect x="226" y="70" width="14" height="22" rx="2" fill="#475569" stroke="#334155" stroke-width="0.8"/>
+    <polygon points="240,70 254,64 254,86 240,92" fill="#374151"/>
+    <circle cx="220" cy="96" r="3" fill="#6b7280"/>
+    <circle cx="270" cy="96" r="3" fill="#6b7280"/>
+    <text font-size="9" font-family="Arial,sans-serif" fill="#64748b" x="245" y="118" text-anchor="middle">Fussplatte</text>
+
+    <!-- Sicherungsstift Traverse -->
+    <rect x="332" y="54" width="50" height="10" rx="2" fill="#475569" stroke="#334155" stroke-width="0.8"/>
+    <polygon points="332,54 382,54 390,50 340,50" fill="#64748b" stroke="#475569" stroke-width="0.6"/>
+    <circle cx="344" cy="59" r="4" fill="#1f2937"/>
+    <circle cx="370" cy="59" r="4" fill="#1f2937"/>
+    <rect x="338" y="64" width="8" height="22" rx="2" fill="#374151"/>
+    <polygon points="346,64 354,60 354,82 346,86" fill="#1f2937"/>
+    <text font-size="9" font-family="Arial,sans-serif" fill="#64748b" x="357" y="102" text-anchor="middle">Sicherung</text>
+  </svg>`
+};
+
+let etSelectedPrio='';
+function setETPrio(btn){
+  etSelectedPrio=btn.dataset.prio;
+  document.getElementById('et-prioritaet').value=etSelectedPrio;
+  document.querySelectorAll('.et-prio-btn').forEach(b=>b.style.background='transparent');
+  btn.style.background='rgba(0,0,0,0.06)';
+  btn.style.borderColor=btn.style.color;
+}
+function addETItem(typ){
+  etItems.push({id:uid(),typ,anzahl:1,hersteller:'',masse:'',bemerkung:''});
+  renderETItems();
+}
+function removeETItem(id){etItems=etItems.filter(x=>x.id!==id);renderETItems();}
+function etQtyChange(id,delta){
+  const item=etItems.find(x=>x.id===id);if(!item)return;
+  item.anzahl=Math.max(1,parseInt(item.anzahl||1)+delta);
+  const el=document.getElementById('et-qty-'+id);if(el)el.value=item.anzahl;
+}
+function etFieldInput(el){
+  const id=el.dataset.id,field=el.dataset.field;
+  const item=etItems.find(x=>x.id===id);if(item)item[field]=el.value;
+}
+function renderETItems(){
+  const list=document.getElementById('et-items-list');
+  const empty=document.getElementById('et-items-empty');
+  if(!list)return;
+  if(!etItems.length){list.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty)empty.style.display='none';
+  list.innerHTML=etItems.map(item=>`
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;position:relative">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:12px 0 0 12px"></div>
+      <div style="padding:14px 14px 14px 18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent)">${item.typ}</div>
+          <button onclick="removeETItem('${item.id}')" style="border:none;background:transparent;color:var(--red);font-size:18px;cursor:pointer;padding:0;margin-left:auto">×</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center" class="at-item-grid">
+          <div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+              <div style="font-size:11px;color:var(--sub);font-weight:700;letter-spacing:.06em">STÜCKZAHL</div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <button onclick="etQtyChange('${item.id}',-1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+                <input id="et-qty-${item.id}" type="number" min="1" value="${item.anzahl||1}"
+                  data-id="${item.id}" data-field="anzahl" oninput="etFieldInput(this);this.value=Math.max(1,parseInt(this.value)||1);etItems.find(x=>x.id==='${item.id}').anzahl=parseInt(this.value)||1"
+                  style="width:56px;height:34px;border:1.5px solid var(--accent);border-radius:8px;background:var(--bg2);color:var(--accent);font-size:20px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield">
+                <button onclick="etQtyChange('${item.id}',+1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:6px">
+                <div class="field" style="margin-bottom:0"><label>Hersteller</label>
+                  <input type="text" placeholder="z.B. SSI Schäfer" data-id="${item.id}" data-field="hersteller" value="${item.hersteller||''}" oninput="etFieldInput(this)" style="width:100%;box-sizing:border-box">
+                </div>
+                <div class="field" style="margin-bottom:0"><label>Masse / Typ</label>
+                  <input type="text" placeholder="z.B. H4500 B80" data-id="${item.id}" data-field="masse" value="${item.masse||''}" oninput="etFieldInput(this)" style="width:100%;box-sizing:border-box">
+                </div>
+              </div>
+              ${(item.typ==='Diagonalstrebe'||item.typ==='Horizontalstrebe')?`
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:8px">
+                <div class="field" style="margin-bottom:0"><label>Länge (mm)</label>
+                  <input type="number" placeholder="z.B. 1100" data-id="${item.id}" data-field="laenge" value="${item.laenge||''}" oninput="etFieldInput(this)" style="width:100%;box-sizing:border-box">
+                </div>
+                <div class="field" style="margin-bottom:0"><label>Breite (mm)</label>
+                  <input type="number" placeholder="z.B. 50" data-id="${item.id}" data-field="breite" value="${item.breite||''}" oninput="etFieldInput(this)" style="width:100%;box-sizing:border-box">
+                </div>
+                <div class="field" style="margin-bottom:0"><label>Höhe (mm)</label>
+                  <input type="number" placeholder="z.B. 35" data-id="${item.id}" data-field="hoehe" value="${item.hoehe||''}" oninput="etFieldInput(this)" style="width:100%;box-sizing:border-box">
+                </div>
+                <div class="field" style="margin-bottom:0"><label>Lochmass (mm)</label>
+                  <input type="number" placeholder="z.B. 50" data-id="${item.id}" data-field="lochmass" value="${item.lochmass||''}" oninput="etFieldInput(this)" style="width:100%;box-sizing:border-box">
+                </div>
+              </div>`:''}
+            </div>
+          </div>
+          <div style="opacity:0.95">${ET_SKETCHES[item.typ]?ET_SKETCHES[item.typ](item.id):''}</div>
+        </div>
+        <div style="margin-top:10px">
+          <div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.06em;margin-bottom:4px">BEMERKUNG</div>
+          <input type="text" value="${item.bemerkung||''}" placeholder="Freitext..."
+            data-id="${item.id}" data-field="bemerkung" oninput="etFieldInput(this)"
+            style="width:100%;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box">
+        </div>
+      </div>
+    </div>`).join('');
+}
 function saveErsatzteil(){
-  const e={id:uid(),kunde:gv('et-kunde'),reihe:gv('et-reihe'),datum:gv('et-datum'),erfasser:gv('et-erfasser'),typ:document.getElementById('et-typ')?.value||'',hersteller:gv('et-hersteller'),anzahl:gv('et-anzahl'),prioritaet:document.getElementById('et-prioritaet')?.value||'',bemerkung:gv('et-bemerkung'),photos:[...etPhotos]};
-  ersatzteile.unshift(e);saveET();etPhotos=[];renderETGrid();
-  toast('Ersatzteil gespeichert ✓');showScreen('ersatzteile-list');renderETList();
+  if(!etItems.length){toast('Mindestens ein Bauteil erforderlich','#dc2626');return;}
+  const e={id:uid(),kunde:gv('et-kunde'),reihe:gv('et-reihe'),datum:gv('et-datum'),erfasser:gv('et-erfasser'),
+    prioritaet:document.getElementById('et-prioritaet')?.value||'',
+    items:[...etItems],photos:[...etPhotos]};
+  savePhotosToIDB('et_'+e.id,e.photos).then(k=>{e.photos=k;ersatzteile.unshift(e);saveET();}).catch(()=>{ersatzteile.unshift(e);saveET();});
+  etItems=[];etPhotos=[];etSelectedPrio='';
+  document.querySelectorAll('.et-prio-btn').forEach(b=>b.style.background='transparent');
+  renderETItems();renderETGrid();
+  toast('Ersatzteile gespeichert ✓');showScreen('ersatzteile-list');renderETList();
 }
 function renderETList(){
   const el=document.getElementById('ersatzteile-entry-list');if(!el)return;
@@ -1434,7 +1864,7 @@ function renderETList(){
   </div>`).join('');
 }
 
-renderList();
+// renderList called by initAppData
 
 // ── TAB SWITCHING ─────────────────────────────────────────
 let activeTab = 'aufnahmen';
@@ -1498,7 +1928,7 @@ try{settings=JSON.parse(localStorage.getItem('nm_settings')||'{}');
   // Auto-populate EN 15635 Kontrollpunkte if empty
   if(!settings.kontrollpunkte||settings.kontrollpunkte.length===0){
     settings.kontrollpunkte=EN15635_KONTROLLPUNKTE.map(p=>({...p}));
-    localStorage.setItem('nm_settings',JSON.stringify(settings));
+    idbSave('nm_settings',settings);
   }
 }catch(e){
   settings={firma:'NeziMont GmbH',pruefpunkte:[],kontrollpunkte:EN15635_KONTROLLPUNKTE.map(p=>({...p}))};
@@ -1506,20 +1936,20 @@ try{settings=JSON.parse(localStorage.getItem('nm_settings')||'{}');
 
 function saveSettings(){
   settings.firma=document.getElementById('set-firma')?.value||'NeziMont GmbH';
-  localStorage.setItem('nm_settings',JSON.stringify(settings));
+  idbSave('nm_settings',settings);
 }
 function addPruefpunkt(){
   const inp=document.getElementById('new-pruefpunkt');
   const txt=inp?.value?.trim();
   if(!txt)return;
   settings.pruefpunkte.push({id:uid(),text:txt,pflicht:false});
-  localStorage.setItem('nm_settings',JSON.stringify(settings));
+  idbSave('nm_settings',settings);
   inp.value='';
   renderSettings();
 }
 function deletePruefpunkt(id){
   settings.pruefpunkte=settings.pruefpunkte.filter(p=>p.id!==id);
-  localStorage.setItem('nm_settings',JSON.stringify(settings));
+  idbSave('nm_settings',settings);
   renderSettings();
 }
 function exportPruefpunkte(){
@@ -1548,7 +1978,7 @@ function importPruefpunkte(ev){
           }
         });
         if(data.firma&&!settings.firma)settings.firma=data.firma;
-        localStorage.setItem('nm_settings',JSON.stringify(settings));
+        idbSave('nm_settings',settings);
         renderSettings();
         toast(added+' Prüfpunkte importiert ✓');
       }else{
@@ -1562,10 +1992,10 @@ function importPruefpunkte(ev){
 
 // ── WÖCHENTLICHE KONTROLLE ───────────────────────────────
 let kontrollen=[];
-try{kontrollen=JSON.parse(localStorage.getItem('nm_kontrollen')||'[]');}catch(e){}
+// Data loaded via initAppData()
 let kontrolleSigPad={drawing:false,lastX:0,lastY:0};
 const kontrolleFotos={};
-function saveKontrolleData(){localStorage.setItem('nm_kontrollen',JSON.stringify(kontrollen));}
+function saveKontrolleData(){idbSave('nm_kontrollen',kontrollen);}
 
 function newKontrolle(){
   sv('kf-reihe','');sv('kf-bemerkung','');
@@ -1642,7 +2072,7 @@ function saveKontrolle(){
     antworten.push({id:p.id,text:p.text,status,bemerkung:document.getElementById('k-bem-'+p.id)?.value||'',foto:kontrolleFotos[p.id]||null});
   });
   const entry={id:uid(),kunde:currentUser?.name||currentUser?.username||'',reihe:gv('kf-reihe'),datum:gv('kf-datum'),bemerkung:gv('kf-bemerkung'),antworten,maengelCount,unterschrift:getKontrolleSig(),firma:settings.firma};
-  kontrollen.unshift(entry);saveKontrolleData();
+  savePhotosToIDB('k_'+entry.id,entry.fotos||[]).then(k=>{entry.fotos=k;kontrollen.unshift(entry);saveKontrolleData();}).catch(()=>{kontrollen.unshift(entry);saveKontrolleData();});
   exportKontrollePDF(entry);toast('Gespeichert & PDF erstellt ✓');switchTab('kontrolle');
 }
 
@@ -1731,7 +2161,7 @@ function importKontrollpunkte(ev){
             settings.kontrollpunkte.push({id:uid(),text:p.text});added++;
           }
         });
-        localStorage.setItem('nm_settings',JSON.stringify(settings));
+        idbSave('nm_settings',settings);
         renderSettings();toast(added+' Kontrollpunkte importiert ✓');
       }else{toast('Ungültige Datei','#dc2626');}
     }catch(err){toast('Fehler beim Importieren','#dc2626');}
@@ -1742,18 +2172,18 @@ function importKontrollpunkte(ev){
 function resetKontrollpunkte(){
   if(!confirm('Standard-Prüfpunkte gemäss EN 15635 wiederherstellen? Bestehende werden ersetzt.'))return;
   settings.kontrollpunkte=EN15635_KONTROLLPUNKTE.map(p=>({...p}));
-  localStorage.setItem('nm_settings',JSON.stringify(settings));
+  idbSave('nm_settings',settings);
   renderSettings();toast('EN 15635 Prüfpunkte wiederhergestellt ✓');
 }
 function addKontrollpunkt(){
   const inp=document.getElementById('new-kontrollpunkt');const txt=inp?.value?.trim();if(!txt)return;
   if(!settings.kontrollpunkte)settings.kontrollpunkte=[];
   settings.kontrollpunkte.push({id:uid(),text:txt});
-  localStorage.setItem('nm_settings',JSON.stringify(settings));inp.value='';renderSettings();
+  idbSave('nm_settings',settings);inp.value='';renderSettings();
 }
 function deleteKontrollpunkt(id){
   settings.kontrollpunkte=(settings.kontrollpunkte||[]).filter(p=>p.id!==id);
-  localStorage.setItem('nm_settings',JSON.stringify(settings));renderSettings();
+  idbSave('nm_settings',settings);renderSettings();
 }
 
 function renderSettings(){
@@ -1804,11 +2234,11 @@ function renderSettings(){
 
 // ── INSPEKTIONEN ──────────────────────────────────────────
 let inspektionen=[];
-try{inspektionen=JSON.parse(localStorage.getItem('nm_inspektionen')||'[]');}catch(e){}
+// Data loaded via initAppData()
 let editingInspId=null;
 let sigPad={drawing:false,lastX:0,lastY:0};
 
-function saveInsp(){localStorage.setItem('nm_inspektionen',JSON.stringify(inspektionen));}
+function saveInsp(){idbSave('nm_inspektionen',inspektionen);}
 
 function newInspektion(){
   editingInspId=null;
@@ -1822,11 +2252,11 @@ function newInspektion(){
 
 // ── INSPEKTION KUNDEN / RÄUME / REIHEN ───────────────────
 let inspKunden = [];
-try{inspKunden = JSON.parse(localStorage.getItem('nm_insp_kunden')||'[]');}catch(e){}
+// Data loaded via initAppData()
 let activeKundeId = null;
 let activeRaumId = null;
 
-function saveInspKundenData(){localStorage.setItem('nm_insp_kunden', JSON.stringify(inspKunden));}
+function saveInspKundenData(){idbSave('nm_insp_kunden',inspKunden);}
 
 function saveInspKunde(){
   const name = gv('ik-name').trim();
@@ -2470,28 +2900,27 @@ function renderSammelpdfList(){
 function selectAllSammelpdf(){
   document.querySelectorAll('.sp-check').forEach(cb=>cb.checked=true);
 }
-async function exportSammelPDF(){
-  const selected=[];
-  document.querySelectorAll('.sp-check').forEach(cb=>{
-    if(cb.checked){const idx=parseInt(cb.dataset.idx);if(entries[idx])selected.push(entries[idx]);}
-  });
-  if(!selected.length){toast('Keine Positionen gewählt','#dc2626');return;}
-  toast('PDF wird erstellt...','#0000cd');
-  await buildPDF(selected,'RegalScan_Sammel_'+new Date().toISOString().split('T')[0]+'.pdf');
-  toast('Sammel-PDF exportiert ✓');
-}
-
-
 renderList();
 
 // ── LIST ─────────────────────────────────────────────────
-function deleteEntry(id){
-  if(!confirm('Aufnahme löschen?'))return;
-  entries=entries.filter(x=>x.id!==id);save();toast('Gelöscht','#dc2626');showScreen('regal-list');
+// ── FIELD CARDS ──────────────────────────────────────────
+function onFelderChange(){
+  // When abschnitte are active, f-felder changes don't matter - abschnitte control the count
+  if(regalAbschnitte&&regalAbschnitte.length>0){updateSketch();calcGesamtsystem();return;}
+  updateFieldCards();updateSketch();calcGesamtsystem();
 }
 
-// ── FIELD CARDS ──────────────────────────────────────────
-function onFelderChange(){updateFieldCards();updateSketch();calcGesamtsystem();}
+function getTotalFelder(){
+  // If abschnitte exist, total felder = sum of all abschnitte
+  if(regalAbschnitte&&regalAbschnitte.length>0){
+    return regalAbschnitte.reduce((sum,a)=>sum+Math.max(parseInt(a.felder)||0,0),0);
+  }
+  return Math.min(Math.max(parseInt(gv('f-felder'))||0,0),20);
+}
+
+function getDefaultEbenen(){
+  return parseInt(gv('f-ebenen'))||4;
+}
 function onBreiteChange(){
   const bw=gv('f-breite');const felder=parseInt(gv('f-felder'))||0;
   for(let i=0;i<felder;i++){const el=document.getElementById('lw-'+i);if(el&&!el.value&&bw)el.value=bw;}
@@ -2499,10 +2928,9 @@ function onBreiteChange(){
 }
 
 function updateFieldCards(restoreData){
-  const felder=Math.min(Math.max(parseInt(gv('f-felder'))||0,0),20);
   const grid=document.getElementById('field-cards');if(!grid)return;
   const oldLW=[],oldEB=[],oldLH=[];
-  for(let i=0;i<20;i++){
+  for(let i=0;i<80;i++){
     const lw=document.getElementById('lw-'+i),eb=document.getElementById('eb-'+i);
     oldLW[i]=lw?lw.value:'';oldEB[i]=eb?eb.value:'';
     const fe=parseInt(eb?eb.value:'')||parseInt(gv('f-ebenen'))||0;
@@ -2510,8 +2938,29 @@ function updateFieldCards(restoreData){
   }
   grid.innerHTML='';
   const bw=gv('f-breite');
-  const hide=regelmaessig?'none':'block';
-  for(let i=0;i<felder;i++){
+  const forceIndividual=regalAbschnitte&&regalAbschnitte.length>0;
+  const hide=(forceIndividual||!regelmaessig)?'block':'none';
+  // Build field list
+  let fieldMeta=[];
+  if(regalAbschnitte&&regalAbschnitte.length>0){
+    let g=0;
+    regalAbschnitte.forEach((sec,si)=>{
+      const n=Math.max(parseInt(sec.felder)||0,0);
+      for(let f=0;f<n;f++){fieldMeta.push({g,si,f,sFirst:f===0,trenn:sec.trenngrund});g++;}
+    });
+  } else {
+    const n=Math.min(Math.max(parseInt(gv('f-felder'))||0,0),20);
+    for(let k=0;k<n;k++) fieldMeta.push({g:k,si:null,f:k,sFirst:false,trenn:null});
+  }
+  const felder=fieldMeta.length;
+  for(let idx=0;idx<felder;idx++){
+    const meta=fieldMeta[idx];
+    const i=meta.g;
+    // Section divider
+    if(meta.si!==null&&meta.sFirst&&meta.si>0){
+      const icons={'Stütze':'🏛','Wand':'🧱','Lücke':'↔'};
+      grid.innerHTML+=`<div style="grid-column:1/-1;display:flex;align-items:center;gap:6px;margin:8px 0 4px;"><div style="flex:1;border-top:1px dashed var(--border);opacity:0.5"></div><span style="font-size:10px;color:var(--sub);white-space:nowrap;padding:0 8px">Abschnitt ${meta.si+1}</span><div style="flex:1;border-top:1px dashed var(--border);opacity:0.5"></div></div>`;
+    }
     const lwVal=restoreData?restoreData.lichtweiten?.[i]||'':oldLW[i]||(bw||'');
     const ebVal=restoreData?restoreData.felderEbenen?.[i]||'':oldEB[i]||gv('f-ebenen')||'';
     const fe=parseInt(ebVal)||parseInt(gv('f-ebenen'))||4;
@@ -2577,9 +3026,9 @@ function updateFieldCards(restoreData){
     if(dsvSaved) dsvState[i]=dsvSaved;
   }
   setTimeout(()=>{
-    applyRegelm();
-    const felder2=parseInt(gv('f-felder'))||0;
-    if(!regelmaessig) for(let i=0;i<felder2;i++) updateLHInputs(i,restoreData?.lichthoehen?.[i]);
+    // Apply LH inputs for all fields
+    const felder2=getTotalFelder();
+    for(let i=0;i<felder2;i++) updateLHInputs(i,restoreData?.lichthoehen?.[i]);
   },0);
 }
 
@@ -2652,7 +3101,7 @@ function updateLHInputs(f,restoreLH){
 
 // ── GET FIELD DATA ────────────────────────────────────────
 function getFieldData(){
-  const felder=parseInt(gv('f-felder'))||0;
+  const felder=getTotalFelder();
   const lichtweiten=[],felderEbenen=[],lichthoehen=[],einlagen=[],rwg=[],rwgVon=[],rwgBis=[],dsv=[],dsvVon=[],dsvBis=[];
   for(let i=0;i<felder;i++){
     lichtweiten.push(document.getElementById('lw-'+i)?.value?.trim()||'');
@@ -2733,348 +3182,8 @@ function calcGesamtsystem(){
 }
 
 // ── SKETCH ────────────────────────────────────────────────
-function updateSketch(){
-  const felder=Math.min(Math.max(parseInt(gv('f-felder'))||3,1),12);
-  const ebenen=Math.min(Math.max(parseInt(gv('f-ebenen'))||4,1),10);
-  const fd=getFieldData();
-  const canvas=document.getElementById('regal-sketch');if(!canvas)return;
-  const dpr=window.devicePixelRatio||1,W=Math.min(window.innerWidth,800)-32,H=200;
-  canvas.width=W*dpr;canvas.height=H*dpr;
-  canvas.style.width=W+'px';canvas.style.height=H+'px';
-  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-  drawRegal(ctx,felder,ebenen,fd,toggleState.anbau==='ja',W,H);
-}
-
-function drawRegal(ctx,felder,ebenen,fd,isAnbau,W,H){
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#f0f4f8';ctx.fillRect(0,0,W,H);
-  const CUF='#1a3a8f',CUS='#102878',CUT='#2d52b8',CUH='#4a70d8';
-  const CTF='#c84800',CTT='#e86010',CTS='#8c2e00';
-  const ANG=28*Math.PI/180,DSCALE=0.40,FD=Math.min(W*0.22,66);
-  const dx=Math.cos(ANG)*DSCALE,dy=-Math.sin(ANG)*DSCALE;
-  const PL=44,PT=28,PR=Math.ceil(FD*dx)+24,PB=40;
-  const rW=W-PL-PR,rH=H-PT-Math.ceil(Math.abs(FD*dy))-PB;
-  const OX=PL,OY=PT+Math.abs(FD*dy);
-  const FX=x=>OX+x,FY=y=>OY+y,IX=(x,d)=>OX+x+d*dx,IY=(y,d)=>OY+y+d*dy;
-  const lws=(fd.lichtweiten||[]).map(l=>parseFloat(l)||0);
-  const totLW=lws.reduce((a,b)=>a+b,0);
-  const fw=totLW>0?lws.map(l=>(l/totLW)*rW):Array(felder).fill(rW/felder);
-  const fx_=[0];for(let i=0;i<felder;i++)fx_.push(fx_[i]+fw[i]);
-  function getFE(f){const v=fd.felderEbenen&&fd.felderEbenen[f]?parseInt(fd.felderEbenen[f]):0;return v>0?v:ebenen;}
-  function getFieldLevels(f){
-    const fe=getFE(f);
-    // single traverse: center it vertically
-    if(fe===1){
-      const mid=rH/2;
-      return{fe:1,fy_:[mid-TH,mid+TH],lh:[TH*2]};
-    }
-    const TOP=Math.max(10,Math.round(rH*0.09));
-    const fLH=((fd.lichthoehen||[])[f]||[]).map(v=>parseFloat(v)||0);
-    const totFLH=fLH.reduce((a,b)=>a+b,0);
-    if(totFLH>0&&fLH.length===fe){
-      const arr=fLH.map(v=>(v/totFLH)*(rH-TOP));
-      const fy_=[TOP];for(let i=0;i<fe;i++)fy_.push(fy_[i]+arr[i]);
-      return{fe,fy_,lh:arr};
-    }
-    const lh=Array(fe).fill((rH-TOP)/fe);
-    const fy_=[TOP];for(let i=0;i<fe;i++)fy_.push(fy_[i]+lh[i]);
-    return{fe,fy_,lh};
-  }
-  const avgFW=rW/felder;
-  const UW=Math.max(3,Math.min(5,avgFW/9));
-  const UD=FD*0.85,TH=Math.max(1.5,Math.min(3,rH/(ebenen*9))),TD=FD*0.85;
-  function quad(x1,y1,x2,y2,d1,d2,col,str){
-    ctx.fillStyle=col;ctx.beginPath();
-    ctx.moveTo(IX(x1,d1),IY(y1,d1));ctx.lineTo(IX(x2,d1),IY(y2,d1));
-    ctx.lineTo(IX(x2,d2),IY(y2,d2));ctx.lineTo(IX(x1,d2),IY(y1,d2));
-    ctx.closePath();ctx.fill();
-    if(str){ctx.strokeStyle=str;ctx.lineWidth=0.3;ctx.stroke();}
-  }
-  function drawUpright(s,D,alpha){
-    if(isAnbau&&s===0)return;
-    const ux=fx_[s]-UW/2;ctx.globalAlpha=alpha;
-    if(D===0){quad(ux+UW,0,ux+UW,rH,0,UW*0.6,CUS,null);quad(ux,0,ux+UW,0,0,UW*0.6,CUT,null);}
-    ctx.fillStyle=CUF;ctx.fillRect(IX(ux,D),IY(0,D),UW,rH);
-    ctx.fillStyle='rgba(40,70,180,0.16)';ctx.fillRect(IX(ux+UW*0.2,D),IY(UW*0.2,D),UW*0.8,rH-UW*0.4);
-    ctx.fillStyle=CUH;ctx.fillRect(IX(ux,D),IY(0,D),Math.max(1,UW*0.13),rH);
-    ctx.fillStyle=CUT;ctx.fillRect(IX(ux,D),IY(0,D),UW,Math.max(1.5,UW*0.22));
-    ctx.fillRect(IX(ux,D),IY(rH-Math.max(1.5,UW*0.22),D),UW,Math.max(1.5,UW*0.22));
-    ctx.strokeStyle=CUS;ctx.lineWidth=0.35;ctx.strokeRect(IX(ux,D),IY(0,D),UW,rH);
-    ctx.globalAlpha=1;
-  }
-  function drawTraverse(f,D,alpha){
-    const{fe,fy_}=getFieldLevels(f);
-    const bx1=fx_[f]+UW/2,bx2=fx_[f+1]-UW/2,bw=bx2-bx1;
-    ctx.globalAlpha=alpha;
-    for(let lv=0;lv<fe;lv++){
-      const ty=fy_[lv];
-      ctx.fillStyle=CTF;ctx.fillRect(IX(bx1,D),IY(ty,D),bw,TH);
-      ctx.fillStyle='rgba(255,130,30,0.35)';ctx.fillRect(IX(bx1,D),IY(ty,D),bw,Math.max(1,TH*0.3));
-      ctx.strokeStyle=CTS;ctx.lineWidth=0.3;ctx.strokeRect(IX(bx1,D),IY(ty,D),bw,TH);
-      quad(bx1,ty,bx2,ty,D,D+UW*0.6,CTT,CTS);
-      quad(bx2,ty,bx2,ty+TH,D,D+UW*0.6,CTS,null);
-    }
-    ctx.globalAlpha=1;
-  }
-  // Floor
-  ctx.fillStyle='#d8dfe8';
-  ctx.beginPath();ctx.moveTo(FX(0),FY(rH));ctx.lineTo(FX(rW),FY(rH));
-  ctx.lineTo(IX(rW,FD),IY(rH,FD));ctx.lineTo(IX(0,FD),IY(rH,FD));ctx.closePath();ctx.fill();
-  ctx.fillStyle='#b0bcc8';ctx.fillRect(FX(0),FY(rH),rW,4);
-  // Render order
-  for(let s=0;s<=felder;s++)drawUpright(s,FD,0.18);
-  for(let f=0;f<felder;f++)drawTraverse(f,FD,0.18);
-  ctx.strokeStyle=CUS;ctx.lineWidth=0.5;ctx.setLineDash([]);
-  for(let s=0;s<=felder;s++){if(isAnbau&&s===0)continue;const ux=fx_[s]-UW/2;
-    ctx.beginPath();ctx.moveTo(FX(ux+UW/2),FY(0));ctx.lineTo(IX(ux+UW/2,FD),IY(0,FD));ctx.stroke();
-    ctx.beginPath();ctx.moveTo(FX(ux+UW/2),FY(rH));ctx.lineTo(IX(ux+UW/2,FD),IY(rH,FD));ctx.stroke();
-  }
-  // Einlegeböden (behind traverses)
-  for(let f=0;f<felder;f++){
-    const{fe,fy_}=getFieldLevels(f);
-    const x1=fx_[f]+UW/2,x2=fx_[f+1]-UW/2,gw=x2-x1;
-    const einlInner=document.getElementById('einlagen-inner-'+f);
-    if(!einlInner)continue;
-    const rows=Array.from(einlInner.children);
-    rows.forEach((row,arrayIdx)=>{
-      let found='—';
-      row.querySelectorAll('button').forEach(b=>{if(b.style.borderColor!=='var(--border)'&&b.style.borderColor!=='')found=b.textContent.trim();});
-      if(found==='—')return;
-      // arrayIdx 0=top level, fe-1=bottom. lv = arrayIdx
-      const lv=arrayIdx;
-      if(lv>=fe)return;
-      const topY=fy_[lv]+TH;
-      const pH=Math.max(2,Math.min(4,(fy_[lv+1]-fy_[lv]-TH)*0.1));
-      ctx.fillStyle='rgba(200,205,212,0.85)';
-      ctx.beginPath();ctx.moveTo(FX(x1),FY(topY));ctx.lineTo(FX(x2),FY(topY));
-      ctx.lineTo(IX(x2,FD),IY(topY,FD));ctx.lineTo(IX(x1,FD),IY(topY,FD));ctx.closePath();ctx.fill();
-      ctx.fillStyle='rgba(170,175,183,0.9)';ctx.fillRect(FX(x1),FY(topY),gw,pH);
-      ctx.save();
-      ctx.beginPath();ctx.moveTo(FX(x1),FY(topY));ctx.lineTo(FX(x2),FY(topY));
-      ctx.lineTo(IX(x2,FD),IY(topY,FD));ctx.lineTo(IX(x1,FD),IY(topY,FD));ctx.closePath();ctx.clip();
-      ctx.strokeStyle='rgba(100,105,115,0.20)';ctx.lineWidth=0.5;
-      for(let hx=0;hx<=gw+FD;hx+=Math.max(5,gw/8)){ctx.beginPath();ctx.moveTo(FX(x1+hx),FY(topY));ctx.lineTo(IX(x1+hx,FD),IY(topY,FD));ctx.stroke();}
-      ctx.restore();
-      ctx.strokeStyle='rgba(130,135,145,0.5)';ctx.lineWidth=0.5;
-      ctx.beginPath();ctx.moveTo(FX(x1),FY(topY));ctx.lineTo(FX(x2),FY(topY));
-      ctx.lineTo(IX(x2,FD),IY(topY,FD));ctx.lineTo(IX(x1,FD),IY(topY,FD));ctx.closePath();ctx.stroke();
-      ctx.strokeRect(FX(x1),FY(topY),gw,pH);
-    });
-  }
-  for(let f=0;f<felder;f++)drawTraverse(f,0,1.0);
-  // RWG
-  for(let f=0;f<felder;f++){
-    const jaEl=document.getElementById('rwg-ja-'+f);
-    if(!jaEl||jaEl.style.borderColor!=='var(--accent)')continue;
-    const{fe,fy_}=getFieldLevels(f);
-    const von=Math.max(1,parseInt(document.getElementById('rwg-von-'+f)?.value)||1);
-    const bis=Math.min(fe,parseInt(document.getElementById('rwg-bis-'+f)?.value)||fe);
-    const x1=fx_[f]+UW/2,x2=fx_[f+1]-UW/2;
-    const lvTop=fe-bis,lvBot=fe-von;
-    const ry1=IY(fy_[Math.max(0,lvTop)],FD),ry2=IY(fy_[Math.min(fe,lvBot+1)],FD);
-    const rx1=IX(x1,FD),rx2=IX(x2,FD),rgw=rx2-rx1,rgh=ry2-ry1;
-    ctx.fillStyle='rgba(22,163,74,0.12)';ctx.fillRect(rx1,ry1,rgw,rgh);
-    ctx.strokeStyle='rgba(22,163,74,0.5)';ctx.lineWidth=0.5;
-    const cs=Math.max(5,rgw/6),rs=Math.max(5,rgh/8);
-    for(let gx=0;gx<=rgw+.5;gx+=cs){ctx.beginPath();ctx.moveTo(rx1+gx,ry1);ctx.lineTo(rx1+gx,ry1+rgh);ctx.stroke();}
-    for(let gy=0;gy<=rgh+.5;gy+=rs){ctx.beginPath();ctx.moveTo(rx1,ry1+gy);ctx.lineTo(rx1+rgw,ry1+gy);ctx.stroke();}
-    ctx.strokeStyle='rgba(22,163,74,0.8)';ctx.lineWidth=0.8;ctx.strokeRect(rx1,ry1,rgw,rgh);
-    ctx.fillStyle='rgba(22,163,74,0.8)';ctx.font='bold 6px Inter,sans-serif';ctx.textAlign='center';
-    ctx.fillText('RWG',rx1+rgw/2,ry1+7);ctx.textAlign='left';
-  }
-  // DSV – lila Strich auf hinterer Traverse
-  for(let f=0;f<felder;f++){
-    if(dsvState[f]!=='ja')continue;
-    const{fe,fy_}=getFieldLevels(f);
-    const von=Math.max(1,parseInt(document.getElementById('dsv-von-'+f)?.value)||1);
-    const bis=Math.min(fe,parseInt(document.getElementById('dsv-bis-'+f)?.value)||fe);
-    const x1=fx_[f]+UW/2,x2=fx_[f+1]-UW/2;
-    const lvTop=fe-bis,lvBot=fe-von;
-    ctx.strokeStyle='#7c3aed';ctx.lineWidth=1.5;ctx.setLineDash([]);
-    for(let lv=Math.max(0,lvTop);lv<=Math.min(fe-1,lvBot);lv++){
-      const ax=IX(x1,FD),bx=IX(x2,FD),y=IY(fy_[lv]+TH*0.5,FD);
-      ctx.beginPath();ctx.moveTo(ax,y);ctx.lineTo(bx,y);ctx.stroke();
-    }
-  }
-  // Front uprights (last = on top)
-  ctx.strokeStyle=CUF;ctx.lineWidth=1;ctx.setLineDash([]);ctx.globalAlpha=1;
-  for(let s=0;s<=felder;s++)drawUpright(s,0,1.0);
-  // ── Eckschützer – gelbe Markierungen an den Stützen-Ecken ──
-  const ECK_COLOR='rgba(202,138,4,0.85)';
-  const ECK_W=Math.max(3,UW*0.9),ECK_H=Math.max(18,rH*0.18);
-  if(eckSet.has('vl')&&(!isAnbau)){
-    ctx.fillStyle=ECK_COLOR;ctx.fillRect(FX(fx_[0]-UW/2)-ECK_W,FY(rH)-ECK_H,ECK_W,ECK_H);
-  }
-  if(eckSet.has('vr')){
-    ctx.fillStyle=ECK_COLOR;ctx.fillRect(FX(fx_[felder]+UW/2),FY(rH)-ECK_H,ECK_W,ECK_H);
-  }
-  if(eckSet.has('hl')&&(!isAnbau)){
-    ctx.fillStyle=ECK_COLOR;
-    ctx.beginPath();
-    ctx.moveTo(IX(fx_[0]-UW/2,FD)-ECK_W*0.6,IY(rH,FD));
-    ctx.lineTo(IX(fx_[0]-UW/2,FD)-ECK_W*0.6,IY(rH-ECK_H,FD));
-    ctx.lineTo(IX(fx_[0]-UW/2-ECK_W*0.6+ECK_W*0.6,FD),IY(rH-ECK_H,FD));
-    ctx.lineTo(IX(fx_[0]-UW/2,FD),IY(rH,FD));
-    ctx.closePath();ctx.fill();
-    ctx.fillRect(IX(fx_[0]-UW/2,FD)-ECK_W,IY(rH-ECK_H,FD)-1,ECK_W,ECK_H+1);
-  }
-  if(eckSet.has('hr')){
-    ctx.fillStyle=ECK_COLOR;
-    ctx.fillRect(IX(fx_[felder]+UW/2,FD),IY(rH-ECK_H,FD),ECK_W,ECK_H);
-  }
-
-  // ── Anbau marker
-  if(isAnbau){
-    ctx.strokeStyle='rgba(100,120,180,0.5)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-    ctx.beginPath();ctx.moveTo(FX(fx_[0]),FY(0));ctx.lineTo(FX(fx_[0]),FY(rH));ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='rgba(100,120,180,0.8)';ctx.font='bold 7px Inter,sans-serif';ctx.textAlign='center';
-    ctx.fillText('Anbau',FX(fx_[0]),FY(-4));ctx.textAlign='left';
-  }
-  // LH values centered with arrows
-  ctx.font='bold 8px JetBrains Mono,monospace';ctx.textAlign='center';
-  for(let f=0;f<felder;f++){
-    const{fe,fy_,lh}=getFieldLevels(f);
-    const cx=FX(fx_[f]+fw[f]/2);
-    const hasLH=((fd.lichthoehen||[])[f]||[]).some(v=>parseFloat(v)>0);
-    if(!hasLH)continue;
-    for(let lv=0;lv<fe;lv++){
-      const val=((fd.lichthoehen||[])[f]||[])[lv];if(!val)continue;
-      const eNum=fe-lv,txt='LH'+eNum+' '+val+'mm';
-      const y1=FY(fy_[lv]),y2=FY(fy_[lv+1]),mid=(y1+y2)/2;
-      ctx.fillStyle='#1e40af';
-      ctx.font='bold 7px JetBrains Mono,monospace';
-      ctx.fillText(txt,cx,mid+3.5);
-      if(mid-5.5-y1-TH>6){ctx.strokeStyle='#2563eb';ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(cx,mid-7);ctx.lineTo(cx,y1+TH+2);ctx.stroke();ctx.beginPath();ctx.moveTo(cx,y1+TH+2);ctx.lineTo(cx-3,y1+TH+7);ctx.lineTo(cx+3,y1+TH+7);ctx.closePath();ctx.fillStyle='#2563eb';ctx.fill();}
-      if(y2-TH-2-(mid+7)>6){ctx.strokeStyle='#2563eb';ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(cx,mid+7);ctx.lineTo(cx,y2-TH-2);ctx.stroke();ctx.beginPath();ctx.moveTo(cx,y2-TH-2);ctx.lineTo(cx-3,y2-TH-7);ctx.lineTo(cx+3,y2-TH-7);ctx.closePath();ctx.fillStyle='#2563eb';ctx.fill();}
-    }
-  }
-  ctx.textAlign='left';
-  // Lichtweiten labels
-  ctx.font='bold 8px JetBrains Mono,monospace';ctx.textAlign='center';
-  for(let f=0;f<felder;f++){
-    const lw=fd.lichtweiten?.[f];if(!lw)continue;
-    const ax=FX(fx_[f]+UW/2),bx=FX(fx_[f+1]-UW/2),mid=(ax+bx)/2,my=FY(rH)+14;
-    ctx.strokeStyle='#2563eb';ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(ax,my);ctx.lineTo(bx,my);ctx.stroke();
-    ctx.fillStyle='#2563eb';
-    ctx.beginPath();ctx.moveTo(ax,my);ctx.lineTo(ax+4,my-2);ctx.lineTo(ax+4,my+2);ctx.closePath();ctx.fill();
-    ctx.beginPath();ctx.moveTo(bx,my);ctx.lineTo(bx-4,my-2);ctx.lineTo(bx-4,my+2);ctx.closePath();ctx.fill();
-    const tw=ctx.measureText(lw+'mm').width+5;
-    ctx.fillStyle='#f0f4f8';ctx.fillRect(mid-tw/2,my-8,tw,10);
-    ctx.fillStyle='#2563eb';ctx.fillText(lw+'mm',mid,my-1);
-  }
-  ctx.textAlign='left';
-  // Ebenen labels
-  const{fe:fe0,fy_:fy0,lh:lh0}=getFieldLevels(0);
-  ctx.fillStyle='#94a3b8';ctx.font='7px Inter,sans-serif';ctx.textAlign='right';
-  for(let lv=0;lv<fe0;lv++)ctx.fillText('LH'+(fe0-lv),PL-14,FY(fy0[lv]+lh0[lv]/2)+3);
-  ctx.textAlign='left';
-  // ── Rahmenhöhe links (vertikale Masslinie) ──────────────
-  const rahmH_val=parseFloat(gv('f-hoehe'))||0;
-  if(rahmH_val>0){
-    const mx=PL-28, my1=FY(0), my2=FY(rH);
-    ctx.strokeStyle='#64748b';ctx.lineWidth=0.6;ctx.setLineDash([2,2]);
-    ctx.beginPath();ctx.moveTo(mx,my1);ctx.lineTo(mx,my2);ctx.stroke();
-    ctx.setLineDash([]);
-    // arrow heads
-    ctx.beginPath();ctx.moveTo(mx,my1);ctx.lineTo(mx-2,my1+5);ctx.lineTo(mx+2,my1+5);ctx.closePath();ctx.fillStyle='#64748b';ctx.fill();
-    ctx.beginPath();ctx.moveTo(mx,my2);ctx.lineTo(mx-2,my2-5);ctx.lineTo(mx+2,my2-5);ctx.closePath();ctx.fill();
-    // label rotated
-    ctx.save();
-    ctx.translate(mx-5, (my1+my2)/2);
-    ctx.rotate(-Math.PI/2);
-    ctx.fillStyle='#334155';ctx.font='bold 7px JetBrains Mono,monospace';ctx.textAlign='center';
-    ctx.fillText(rahmH_val+'mm',0,0);
-    ctx.restore();
-    ctx.textAlign='left';
-  }
-
-  // ── Gesamtlänge unten (horizontale Masslinie) ────────────
-  const stBr=parseFloat(gv('p-stuetze-breite'))||0;
-  const sumLW=fw.reduce((a,b)=>a+b,0);
-  // Gesamtlänge = (felder+1) * Ständerbreite + Summe Feldweiten (nur wenn echte mm-Werte)
-  const lwVals=(fd.lichtweiten||[]).map(v=>parseFloat(v)||0);
-  const hasRealLW=lwVals.some(v=>v>0);
-  const gesamtMM=hasRealLW&&stBr>0?(felder+1)*stBr+lwVals.reduce((a,b)=>a+b,0):0;
-  if(gesamtMM>0){
-    const gy=FY(rH)+22, gx1=FX(0), gx2=FX(rW);
-    ctx.strokeStyle='#64748b';ctx.lineWidth=0.6;ctx.setLineDash([2,2]);
-    ctx.beginPath();ctx.moveTo(gx1,gy);ctx.lineTo(gx2,gy);ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.beginPath();ctx.moveTo(gx1,gy);ctx.lineTo(gx1+5,gy-2);ctx.lineTo(gx1+5,gy+2);ctx.closePath();ctx.fillStyle='#64748b';ctx.fill();
-    ctx.beginPath();ctx.moveTo(gx2,gy);ctx.lineTo(gx2-5,gy-2);ctx.lineTo(gx2-5,gy+2);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#334155';ctx.font='bold 7px JetBrains Mono,monospace';ctx.textAlign='center';
-    const glLabel=gesamtMM>=1000?(gesamtMM/1000).toFixed(2).replace('.',',')+' m':Math.round(gesamtMM)+' mm';
-    ctx.fillText('∑ '+glLabel,(gx1+gx2)/2,gy+8);
-    ctx.textAlign='left';
-  }
-
-  // Title
-  ctx.fillStyle='#334155';ctx.font='bold 8px JetBrains Mono,monospace';
-  ctx.fillText((isAnbau?'⊏ Anbau  ':'')+felder+(felder>1?' Felder':' Feld')+'  '+ebenen+(ebenen>1?' Ebenen':' Ebene'),PL,PT-8);
-  // Legend
-  const leg=[{c:CUF,l:'Stütze'},{c:CTF,l:'Traverse'},{c:'#7c3aed',l:'DSV'},{c:'rgba(22,163,74,0.8)',l:'RWG'}];
-  ctx.font='7px Inter,sans-serif';let lx=PL;
-  leg.forEach(item=>{ctx.fillStyle=item.c;ctx.fillRect(lx,H-8,7,6);ctx.fillStyle='#64748b';ctx.fillText(item.l,lx+9,H-3);lx+=ctx.measureText(item.l).width+18;});
-}
-
 // ── VIEW ENTRY ────────────────────────────────────────────
-function viewEntry(id){
-  viewingId=id;
-  const e=entries.find(x=>x.id===id);if(!e)return;
-  document.getElementById('detail-title').textContent=(e.kunde||'')+(e.reihe?' — '+e.reihe:'');
-  const badge=(v)=>v?`<span style="font-size:12px;font-weight:600;color:${v==='ja'?'var(--green)':'var(--red)'}">${v==='ja'?'✓ Ja':'✗ Nein'}</span>`:'—';
-  const photos=(e.photos||[]).map(p=>`<div class="photo-thumb"><img src="${p}"></div>`).join('');
-  document.getElementById('detail-content').innerHTML=`
-    <div class="sketch-wrap"><div class="sketch-title">Skizze</div><canvas id="detail-sketch" style="background:#f0f4f8;border-radius:8px"></canvas></div>
-    <div class="detail-section"><h4>Standort</h4><div class="detail-grid">
-      <div class="detail-item"><div class="di-label">KUNDE / LAGER</div><div class="di-value">${e.kunde||'—'}</div></div>
-      <div class="detail-item"><div class="di-label">REIHE</div><div class="di-value">${e.reihe||'—'}</div></div>
-      <div class="detail-item"><div class="di-label">DATUM</div><div class="di-value">${e.datum||'—'}</div></div>
-      <div class="detail-item"><div class="di-label">ERFASSER</div><div class="di-value">${e.erfasser||'—'}</div></div>
-    </div></div>
-    <div class="detail-section"><h4>Regal</h4><div class="detail-grid">
-      <div class="detail-item"><div class="di-label">TYP</div><div class="di-value">${e.typ||'—'}</div></div>
-      <div class="detail-item"><div class="di-label">HERSTELLER</div><div class="di-value">${e.hersteller||'—'}</div></div>
-      <div class="detail-item"><div class="di-label">FELDER</div><div class="di-value">${fmt(e.felder)}</div></div>
-      <div class="detail-item"><div class="di-label">EBENEN</div><div class="di-value">${fmt(e.ebenen)}</div></div>
-      <div class="detail-item"><div class="di-label">RAHMENHÖHE</div><div class="di-value">${fmt(e.hoehe,'mm')}</div></div>
-      <div class="detail-item"><div class="di-label">TRAVERSENLÄNGE</div><div class="di-value">${fmt(e.breite,'mm')}</div></div>
-      <div class="detail-item"><div class="di-label">RAHMENTIEFE</div><div class="di-value">${fmt(e.tiefe,'mm')}</div></div>
-      <div class="detail-item"><div class="di-label">ANBAUFELD</div><div class="di-value">${badge(e.anbau)}</div></div>
-    </div></div>
-    ${photos?`<div class="detail-section"><h4>Fotos</h4><div class="photo-grid">${photos}</div></div>`:''}
-  `;
-  showScreen('detail');
-  setTimeout(()=>{
-    const canvas=document.getElementById('detail-sketch');if(!canvas)return;
-    const dpr=window.devicePixelRatio||1,W=canvas.parentElement.clientWidth-24,H=200;
-    canvas.width=W*dpr;canvas.height=H*dpr;
-    canvas.style.width=W+'px';canvas.style.height=H+'px';
-    const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-    const fd={lichtweiten:e.lichtweiten||[],felderEbenen:e.felderEbenen||[],lichthoehen:e.lichthoehen||[],einlagen:e.einlagen||[],rwg:e.rwg||[],rwgVon:e.rwgVon||[],rwgBis:e.rwgBis||[],dsv:e.dsv||[],dsvVon:e.dsvVon||[],dsvBis:e.dsvBis||[]};
-    // restore dsvState temporarily for drawing
-    const tmpDsv={};(e.dsv||[]).forEach((v,i)=>{if(v==='ja')tmpDsv[i]='ja';});
-    Object.assign(dsvState,tmpDsv);
-    // also restore rwg buttons temporarily (fake)
-    drawRegal(ctx,parseInt(e.felder)||3,parseInt(e.ebenen)||4,fd,e.anbau==='ja',W,H);
-    Object.keys(tmpDsv).forEach(k=>delete dsvState[k]);
-  },80);
-}
-
 // ── EXPORT CSV ────────────────────────────────────────────
-function exportCSV(){
-  const e=entries.find(x=>x.id===viewingId);if(!e)return;
-  const rows=[['Feld','Feldweite (mm)','Ebenen','Einlagen','RWG','DSV']];
-  const felder=parseInt(e.felder)||0;
-  for(let f=0;f<felder;f++){
-    rows.push([f+1,e.lichtweiten?.[f]||e.breite||'',e.felderEbenen?.[f]||e.ebenen||'',(e.einlagen?.[f]||[]).join(';'),e.rwg?.[f]==='ja'?'Ja':'',e.dsv?.[f]==='ja'?'Ja':'']);
-  }
-  const csv=rows.map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\n');
-  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
-  a.download='RegalScan_'+e.kunde+'_'+e.reihe+'.csv';a.click();toast('CSV exportiert ✓');
-}
-
 // ── SHARED PDF HELPERS ───────────────────────────────────
 function makePDFDoc(){
   const{jsPDF}=window.jspdf;
@@ -3185,8 +3294,13 @@ async function exportAnbauteilePDF(entry){
 // ── EXPORT PDF ────────────────────────────────────────────
 async function exportPDF(){
   const e=entries.find(x=>x.id===viewingId);if(!e)return;
-  await buildPDF([e], 'NeziMont_'+(e.kunde||'Aufnahme')+'_'+(e.reihe||'')+'_'+(e.datum||'')+'.pdf');
-  toast('PDF exportiert ✓');
+  try{
+    // Resolve IDB photo keys to base64 before PDF generation
+    const eClone=JSON.parse(JSON.stringify(e));
+    eClone.photos=await loadPhotosFromIDB(eClone.photos||[]);
+    await buildPDF([eClone], 'NeziMont_'+(e.kunde||'Aufnahme')+'_'+(e.reihe||'')+'_'+(e.datum||'')+'.pdf');
+    toast('PDF exportiert ✓');
+  }catch(err){toast('PDF Fehler: '+err.message,'#dc2626');console.error(err);}
 }
 
 async function buildPDF(list, filename, existingDoc, existingY){
@@ -3229,33 +3343,126 @@ async function buildPDF(list, filename, existingDoc, existingY){
     guard(4);
     doc.setDrawColor(...NL);doc.setLineWidth(0.25);doc.line(ml,y,W-mr,y);y+=3;
   }
+  function drawSectionOnCanvas(cx, sec, sW, sH, fd, fieldOffset, entry){
+    const felder=Math.min(Math.max(parseInt(sec.felder)||parseInt(entry.felder)||3,1),12);
+    const ebenen=Math.min(Math.max(parseInt(sec.ebenen)||parseInt(entry.ebenen)||4,1),10);
+    const slice=(arr)=>(arr||[]).slice(fieldOffset,fieldOffset+felder);
+    const fdSec={
+      lichtweiten:slice(fd.lichtweiten),felderEbenen:slice(fd.felderEbenen),
+      lichthoehen:slice(fd.lichthoehen),einlagen:slice(fd.einlagen),
+      rwg:slice(fd.rwg),rwgVon:slice(fd.rwgVon),rwgBis:slice(fd.rwgBis),
+      dsv:slice(fd.dsv),dsvVon:slice(fd.dsvVon),dsvBis:slice(fd.dsvBis)
+    };
+    if(sketchViewMode==='2d'){
+      drawRegal2D(cx,felder,ebenen,fdSec,sW,sH);
+    } else {
+      drawRegal(cx,felder,ebenen,fdSec,entry.anbau==='ja'&&fieldOffset===0,sW,sH,fieldOffset);
+    }
+    return felder;
+  }
+
   function addSketch(e){
-    const skW=540,skH=190,skDpr=3;
-    const cv=document.createElement('canvas');
-    cv.width=skW*skDpr;cv.height=skH*skDpr;
-    const cx=cv.getContext('2d');cx.scale(skDpr,skDpr);
-    cx.fillStyle='#f4f6fb';cx.fillRect(0,0,skW,skH);
+    const secs=e.abschnitte&&e.abschnitte.length>0?e.abschnitte:null;
+    const dpr=3;
+
+    if(!secs){
+      // ── Einzelregal ohne Abschnitte ──
+      const skW=540,skH=190;
+      const cv=document.createElement('canvas');
+      cv.width=skW*dpr;cv.height=skH*dpr;
+      const cx=cv.getContext('2d');cx.scale(dpr,dpr);
+      cx.fillStyle='#f4f6fb';cx.fillRect(0,0,skW,skH);
+      const fd={lichtweiten:e.lichtweiten||[],felderEbenen:e.felderEbenen||[],
+        lichthoehen:e.lichthoehen||[],einlagen:e.einlagen||[],
+        rwg:e.rwg||[],rwgVon:e.rwgVon||[],rwgBis:e.rwgBis||[],
+        dsv:e.dsv||[],dsvVon:e.dsvVon||[],dsvBis:e.dsvBis||[]};
+      const tmp={};(e.dsv||[]).forEach((v,i)=>{if(v==='ja')tmp[i]='ja';});
+      Object.assign(dsvState,tmp);
+      const savedEck=new Set(eckSet);(e.eckPositions||[]).forEach(p=>eckSet.add(p));
+      const oh=document.getElementById('f-hoehe')?.value;
+      const ob=document.getElementById('p-stuetze-breite')?.value;
+      sv('f-hoehe',e.hoehe||'');sv('p-stuetze-breite',e.profiles?.stuetze?.breite||'');
+      if(sketchViewMode==='2d'){
+        drawRegal2D(cx,parseInt(e.felder)||3,parseInt(e.ebenen)||4,fd,skW,skH);
+      } else {
+        drawRegal(cx,parseInt(e.felder)||3,parseInt(e.ebenen)||4,fd,e.anbau==='ja',skW,skH);
+      }
+      sv('f-hoehe',oh||'');sv('p-stuetze-breite',ob||'');
+      Object.keys(tmp).forEach(k=>delete dsvState[k]);
+      eckSet.clear();savedEck.forEach(p=>eckSet.add(p));
+      const img=cv.toDataURL('image/png');
+      const skPdfW=cw;
+      const skPdfH=Math.max(40,Math.round(skPdfW*(skH/skW)));
+      guard(skPdfH+4);
+      doc.setFillColor(248,250,252);doc.roundedRect(ml,y,skPdfW,skPdfH,2,2,'F');
+      doc.setDrawColor(...NL);doc.setLineWidth(0.3);doc.roundedRect(ml,y,skPdfW,skPdfH,2,2,'S');
+      doc.addImage(img,'PNG',ml,y,skPdfW,skPdfH);
+      y+=skPdfH+6;
+      return;
+    }
+
+    // ── Regal mit Abschnitten ──
+    // Max 2 Abschnitte nebeneinander, dann neue Reihe
     const fd={lichtweiten:e.lichtweiten||[],felderEbenen:e.felderEbenen||[],
       lichthoehen:e.lichthoehen||[],einlagen:e.einlagen||[],
       rwg:e.rwg||[],rwgVon:e.rwgVon||[],rwgBis:e.rwgBis||[],
       dsv:e.dsv||[],dsvVon:e.dsvVon||[],dsvBis:e.dsvBis||[]};
-    const tmp={};(e.dsv||[]).forEach((v,i)=>{if(v==='ja')tmp[i]='ja';});
-    Object.assign(dsvState,tmp);
-    const savedEck=new Set(eckSet);(e.eckPositions||[]).forEach(p=>eckSet.add(p));
-    const oh=document.getElementById('f-hoehe')?.value;
-    const ob=document.getElementById('p-stuetze-breite')?.value;
-    sv('f-hoehe',e.hoehe||'');sv('p-stuetze-breite',e.profiles?.stuetze?.breite||'');
-    drawRegal(cx,parseInt(e.felder)||3,parseInt(e.ebenen)||4,fd,e.anbau==='ja',skW,skH);
-    sv('f-hoehe',oh||'');sv('p-stuetze-breite',ob||'');
-    Object.keys(tmp).forEach(k=>delete dsvState[k]);
-    eckSet.clear();savedEck.forEach(p=>eckSet.add(p));
-    const img=cv.toDataURL('image/png');
-    const ph=Math.round(cw*(skH/skW));
-    guard(ph+2);
-    doc.setFillColor(244,246,251);doc.roundedRect(ml,y,cw,ph,1.5,1.5,'F');
-    doc.setDrawColor(...NL);doc.setLineWidth(0.3);doc.roundedRect(ml,y,cw,ph,1.5,1.5,'S');
-    doc.addImage(img,'PNG',ml,y,cw,ph);
-    y+=ph+4;
+
+    const secH=150; // Höhe pro Abschnitt-Reihe
+    const SEP=8;    // Trennlücke zwischen Abschnitten
+    const perRow=2; // Max Abschnitte nebeneinander
+    const rows=[];
+    for(let i=0;i<secs.length;i+=perRow) rows.push(secs.slice(i,i+perRow));
+
+    let fieldOffset=0;
+    rows.forEach(rowSecs=>{
+      const n=rowSecs.length;
+      const secW=Math.floor((cw*2.83-(n-1)*SEP)/n); // cw in pt → px approx
+      const pxW=Math.floor((540-(n-1)*SEP)/n);
+      const totalPxW=pxW*n+(n-1)*SEP;
+
+      const cv=document.createElement('canvas');
+      cv.width=totalPxW*dpr;cv.height=secH*dpr;
+      const cx=cv.getContext('2d');cx.scale(dpr,dpr);
+      cx.fillStyle='#f4f6fb';cx.fillRect(0,0,totalPxW,secH);
+
+      let offsetX=0;
+      rowSecs.forEach((sec,si)=>{
+        cx.save();cx.translate(offsetX,0);
+        cx.beginPath();cx.rect(0,0,pxW,secH);cx.clip();
+        const nf=drawSectionOnCanvas(cx,sec,pxW,secH,fd,fieldOffset,e);
+        cx.restore();
+        fieldOffset+=nf;
+
+        // Trennlinie zwischen Abschnitten
+        if(si<rowSecs.length-1){
+          cx.strokeStyle='#94a3b8';cx.lineWidth=1;cx.setLineDash([3,2]);
+          cx.beginPath();cx.moveTo(offsetX+pxW+SEP/2,8);cx.lineTo(offsetX+pxW+SEP/2,secH-8);cx.stroke();
+          cx.setLineDash([]);
+          cx.fillStyle='#64748b';cx.font='bold 8px Arial';cx.textAlign='center';
+          cx.fillText('L',offsetX+pxW+SEP/2,secH-2);
+        }
+        offsetX+=pxW+SEP;
+      });
+
+      const img=cv.toDataURL('image/png');
+      const pdfH=Math.round(cw*(secH/totalPxW));
+      guard(pdfH+6);
+
+      // Section label row
+      doc.setFillColor(245,247,252);doc.rect(ml,y,cw,pdfH,'F');
+      doc.setDrawColor(...NL);doc.setLineWidth(0.3);doc.roundedRect(ml,y,cw,pdfH,2,2,'S');
+      doc.addImage(img,'PNG',ml,y,cw,pdfH);
+
+      // Abschnitt labels below
+      const lblY=y+pdfH+1.5;
+      rowSecs.forEach((sec,si)=>{
+        const lx=ml+si*(cw/n)+cw/n/2;
+        doc.setTextColor(...SB);doc.setFontSize(6);doc.setFont('helvetica','bold');
+        doc.text('Abschnitt '+((()=>{let fi=0;for(const r of rows){const i=r.indexOf(sec);if(i>=0)return fi+i+1;fi+=r.length;}return 1;})())+' · '+(sec.felder||'?')+('F'),lx,lblY,{align:'center'});
+      });
+      y+=pdfH+10;
+    });
   }
   function addLHTable(e){
     const felder2=parseInt(e.felder)||0;if(!felder2)return;
@@ -3450,6 +3657,7 @@ function renderList(){
 
 // ── NEW / EDIT ────────────────────────────────────────────
 function newEntry(){
+  regalAbschnitte=[];renderAbschnitte();
   editingId=null;currentPhotos=[];
   document.getElementById('form-title').textContent='Neue Aufnahme';
   const FLDS=['f-kunde','f-reihe','f-datum','f-erfasser','f-typ','f-hersteller','f-felder','f-ebenen','f-hoehe','f-breite','f-tiefe','f-bemerkung','f-gangbreite','p-stuetze-dicke','p-stuetze-breite','p-stuetze-hoehe','p-traverse-dicke','p-traverse-breite','p-traverse-hoehe','p-horiz-dicke','p-horiz-breite','p-horiz-hoehe','p-diag-dicke','p-diag-breite','p-diag-hoehe'];
@@ -3465,7 +3673,22 @@ function newEntry(){
 }
 function editEntry(id){
   const e=entries.find(x=>x.id===id);if(!e)return;
-  editingId=id;currentPhotos=[...(e.photos||[])];
+  editingId=id;
+  loadPhotosFromIDB(e.photos||[]).then(loaded=>{currentPhotos=loaded;renderPhotoGrid();}).catch(()=>{currentPhotos=[...(e.photos||[])];renderPhotoGrid();});
+  regalAbschnitte=(e.abschnitte||[]).map(a=>({...a}));setTimeout(renderAbschnitte,80);
+  // Restore sketch view settings
+  if(e.sketchViewMode){
+    sketchViewMode=e.sketchViewMode;
+    document.querySelectorAll('#sk-iso-btn,#sk-2d-btn').forEach(b=>b.classList.remove('active'));
+    const vBtn=document.getElementById(e.sketchViewMode==='2d'?'sk-2d-btn':'sk-iso-btn');
+    if(vBtn)vBtn.classList.add('active');
+  }
+  if(e.sketchHeightMode){
+    sketchHeightMode=e.sketchHeightMode;
+    document.querySelectorAll('#sk-auto-btn,#sk-compact-btn,#sk-tall-btn').forEach(b=>b.classList.remove('active'));
+    const hBtn=document.getElementById('sk-'+e.sketchHeightMode+'-btn');
+    if(hBtn)hBtn.classList.add('active');
+  }
   document.getElementById('form-title').textContent='Aufnahme bearbeiten';
   sv('f-kunde',e.kunde);sv('f-reihe',e.reihe);sv('f-datum',e.datum);sv('f-erfasser',e.erfasser);
   sv('f-typ',e.typ);sv('f-hersteller',e.hersteller);sv('f-felder',e.felder);sv('f-ebenen',e.ebenen);
@@ -3495,12 +3718,86 @@ function editEntry(id){
 }
 
 // ── SAVE ─────────────────────────────────────────────────
+// ── ABSCHNITTE ────────────────────────────────────────────
+// regalAbschnitte declared globally above
+
+function addAbschnitt(){
+  const trenn = 'Lücke';
+  // Capture current form state as first section if no sections yet
+  if(regalAbschnitte.length === 0){
+    const felder = gv('f-felder')||'';
+    const ebenen = gv('f-ebenen')||'';
+    const breite = gv('f-breite')||'';
+    if(felder){
+      regalAbschnitte.push({id:uid(), trenngrund:'Anfang', felder, ebenen, breite, bemerkung:''});
+    }
+  }
+  regalAbschnitte.push({id:uid(), trenngrund:trenn, felder:'', ebenen:gv('f-ebenen')||'', breite:gv('f-breite')||'', bemerkung:''});
+  renderAbschnitte();
+  updateFieldCards();
+  setTimeout(()=>{applyRegelm();updateSketch();},50);
+  setTimeout(updateSketch,200);
+}
+
+function removeAbschnitt(id){
+  regalAbschnitte = regalAbschnitte.filter(x=>x.id!==id);
+  renderAbschnitte();
+  updateFieldCards();
+  setTimeout(()=>{applyRegelm();updateSketch();},50);
+  setTimeout(updateSketch,200);
+}
+
+function abschnittInput(el){
+  const id = el.dataset.id, field = el.dataset.field;
+  const a = regalAbschnitte.find(x=>x.id===id);
+  if(a){ a[field] = el.value; if(field==='felder'||field==='ebenen'){updateFieldCards();setTimeout(()=>{applyRegelm();updateSketch();},50);} }
+}
+
+function renderAbschnitte(){
+  const list = document.getElementById('abschnitte-list');
+  if(!list) return;
+  if(!regalAbschnitte.length){
+    list.innerHTML = '<p style="font-size:12px;color:var(--sub)">Noch keine Abschnitte. Klicke "+ Abschnitt teilen" um die Reihe aufzuteilen.</p>';
+    return;
+  }
+  const trennIcons = {Anfang:'▶',Stütze:'🏛',Wand:'🧱',Lücke:'↔',Parallelreihe:'⇉'};
+  list.innerHTML = regalAbschnitte.map((a,i)=>`
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:10px 0 0 10px"></div>
+      <div style="padding:10px 10px 10px 14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:700;color:var(--accent)">${trennIcons[a.trenngrund]||'▶'} Abschnitt ${i+1}</span>
+          <span style="font-size:11px;color:var(--sub);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 8px">${a.trenngrund}</span>
+          <button onclick="removeAbschnitt('${a.id}')" style="border:none;background:transparent;color:var(--red);font-size:16px;cursor:pointer;padding:0;margin-left:auto">×</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="field" style="margin-bottom:0"><label>Felder</label>
+            <input type="number" min="1" value="${a.felder}" placeholder="z.B. 3" data-id="${a.id}" data-field="felder" oninput="abschnittInput(this)">
+          </div>
+          <div class="field" style="margin-bottom:0"><label>Ebenen</label>
+            <input type="number" min="1" value="${a.ebenen}" placeholder="z.B. 4" data-id="${a.id}" data-field="ebenen" oninput="abschnittInput(this)">
+          </div>
+          <div class="field" style="margin-bottom:0"><label>Feldweite (mm)</label>
+            <input type="number" value="${a.breite}" placeholder="z.B. 2700" data-id="${a.id}" data-field="breite" oninput="abschnittInput(this)">
+          </div>
+        </div>
+        <div class="field" style="margin-top:8px;margin-bottom:0"><label>Bemerkung</label>
+          <input type="text" value="${a.bemerkung}" placeholder="z.B. nach Stütze, Feld beschädigt..." data-id="${a.id}" data-field="bemerkung" oninput="abschnittInput(this)"
+            style="width:100%;box-sizing:border-box">
+        </div>
+      </div>
+    </div>`).join('');
+}
+
 function saveEntry(){
   const fd=getFieldData();
+  const totalFelder=getTotalFelder();
   const entry={
     id:editingId||uid(),
     kunde:gv('f-kunde'),reihe:gv('f-reihe'),datum:gv('f-datum'),erfasser:gv('f-erfasser'),
-    typ:gv('f-typ'),hersteller:gv('f-hersteller'),felder:gv('f-felder'),ebenen:gv('f-ebenen'),
+    typ:gv('f-typ'),hersteller:gv('f-hersteller'),
+    felder:totalFelder>0?String(totalFelder):gv('f-felder'),
+    ebenen:gv('f-ebenen'),
     hoehe:gv('f-hoehe'),breite:gv('f-breite'),tiefe:gv('f-tiefe'),bemerkung:gv('f-bemerkung'),
     gangbreite:gv('f-gangbreite'),gesamtlaenge:gv('f-gesamtlaenge'),
     eckPositions:[...eckSet],anbau:toggleState.anbau,regelmaessig:regelmaessig,
@@ -3508,6 +3805,9 @@ function saveEntry(){
     einlagen:fd.einlagen,rwg:fd.rwg,rwgVon:fd.rwgVon,rwgBis:fd.rwgBis,
     dsv:fd.dsv,dsvVon:fd.dsvVon,dsvBis:fd.dsvBis,
     photos:currentPhotos,
+    abschnitte:[...regalAbschnitte],
+    sketchViewMode:sketchViewMode,
+    sketchHeightMode:sketchHeightMode,
     profiles:{
       stuetze:{dicke:gv('p-stuetze-breite'),breite:gv('p-stuetze-breite'),hoehe:gv('p-stuetze-hoehe'),bem:gv('p-stuetze-dicke')},
       traverse:{dicke:gv('p-traverse-dicke'),breite:gv('p-traverse-breite'),hoehe:gv('p-traverse-hoehe'),bem:gv('p-traverse-dicke')},
@@ -3515,282 +3815,323 @@ function saveEntry(){
       diag:{dicke:gv('p-diag-dicke'),breite:gv('p-diag-breite'),hoehe:gv('p-diag-hoehe')},
     }
   };
-  if(editingId){const idx=entries.findIndex(x=>x.id===editingId);if(idx>=0)entries[idx]=entry;else entries.push(entry);}
-  else entries.unshift(entry);
-  save();toast('Gespeichert ✓');showScreen('regal-list');
+  // Save photos to IDB, then persist
+  savePhotosToIDB('regal_'+entry.id, entry.photos).then(photoKeys=>{
+    entry.photos=photoKeys;
+    if(editingId){const idx=entries.findIndex(x=>x.id===editingId);if(idx>=0)entries[idx]=entry;else entries.push(entry);}
+    else entries.unshift(entry);
+    save();toast('Gespeichert ✓');showScreen('regal-list');renderList();
+  }).catch(()=>{
+    if(editingId){const idx=entries.findIndex(x=>x.id===editingId);if(idx>=0)entries[idx]=entry;else entries.push(entry);}
+    else entries.unshift(entry);
+    save();toast('Gespeichert ✓');showScreen('regal-list');renderList();
+  });
 }
 
 // ── DELETE ────────────────────────────────────────────────
 function deleteEntry(id){
   if(!confirm('Aufnahme löschen?'))return;
+  const de=entries.find(x=>x.id===id);if(de)deletePhotosFromIDB(de.photos||[]).catch(()=>{});
   entries=entries.filter(x=>x.id!==id);save();toast('Gelöscht','#dc2626');showScreen('list');
 }
 
-// ── FIELD CARDS ──────────────────────────────────────────
-function onFelderChange(){updateFieldCards();updateSketch();calcGesamtsystem();}
-function onBreiteChange(){
-  const bw=gv('f-breite');const felder=parseInt(gv('f-felder'))||0;
-  for(let i=0;i<felder;i++){const el=document.getElementById('lw-'+i);if(el&&!el.value&&bw)el.value=bw;}
-  updateSketch();calcGesamtsystem();
-}
-
-function updateFieldCards(restoreData){
-  const felder=Math.min(Math.max(parseInt(gv('f-felder'))||0,0),20);
-  const grid=document.getElementById('field-cards');if(!grid)return;
-  const oldLW=[],oldEB=[],oldLH=[];
-  for(let i=0;i<20;i++){
-    const lw=document.getElementById('lw-'+i),eb=document.getElementById('eb-'+i);
-    oldLW[i]=lw?lw.value:'';oldEB[i]=eb?eb.value:'';
-    const fe=parseInt(eb?eb.value:'')||parseInt(gv('f-ebenen'))||0;
-    oldLH[i]=[];for(let j=0;j<fe;j++){const el=document.getElementById('lh-'+i+'-'+j);oldLH[i][j]=el?el.value:'';}
-  }
-  grid.innerHTML='';
-  const bw=gv('f-breite');
-  const hide=regelmaessig?'none':'block';
-  for(let i=0;i<felder;i++){
-    const lwVal=restoreData?restoreData.lichtweiten?.[i]||'':oldLW[i]||(bw||'');
-    const ebVal=restoreData?restoreData.felderEbenen?.[i]||'':oldEB[i]||gv('f-ebenen')||'';
-    const fe=parseInt(ebVal)||parseInt(gv('f-ebenen'))||4;
-    const rwgSaved=restoreData?.rwg?.[i]||'';
-    const dsvSaved=restoreData?.dsv?.[i]||dsvState[i]||'';
-
-    // Einlegeböden – built via helper (updates dynamically with eb changes)
-    const einlHtml=buildEinlagenHtml(fe, restoreData?.einlagen?.[i]);
-
-    // DSV
-    const dsvVonSaved=restoreData?.dsvVon?.[i]||'';
-    const dsvBisSaved=restoreData?.dsvBis?.[i]||'';
-
-    grid.innerHTML+=`
-      <div class="field-card">
-        <div class="field-card-title">FELD ${i+1}</div>
-        <div id="lw-wrap-${i}" class="field" style="margin-bottom:6px;display:${hide}">
-          <label>Feldweite (mm)</label>
-          <input type="number" id="lw-${i}" value="${lwVal}" placeholder="mm" oninput="updateSketch();calcGesamtsystem()">
-        </div>
-        <div id="eb-wrap-${i}" class="field" style="margin-bottom:6px;display:${hide}">
-          <label>Anz. Ebenen</label>
-          <input type="number" id="eb-${i}" value="${ebVal}" placeholder="${gv('f-ebenen')||'4'}" min="1" max="12" oninput="updateSketch();updateLHInputs(${i})">
-        </div>
-        <div id="lh-wrap-${i}" class="field" style="margin-bottom:6px;display:${hide}">
-          <label>Fachhöhen (mm)</label>
-          <div id="lh-inner-${i}"></div>
-        </div>
-        <div id="bauteile-wrap-${i}" style="display:${hide}">
-          <div style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.5px;margin:8px 0 5px">EINLEGEBÖDEN</div>
-          <div id="einlagen-inner-${i}">${einlHtml}</div>
-          <div style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.5px;margin:10px 0 5px">RÜCKWANDGITTER</div>
-          <div style="display:flex;gap:6px;margin-bottom:6px">
-            <button id="rwg-ja-${i}" onclick="setFeldRWG(${i},'ja')" style="flex:1;padding:8px;font-size:12px;border:1.5px solid ${rwgSaved==='ja'?'var(--accent)':'var(--border)'};border-radius:8px;background:${rwgSaved==='ja'?'rgba(37,99,235,0.08)':'var(--bg2)'};color:${rwgSaved==='ja'?'var(--accent)':'var(--sub)'};cursor:pointer;font-family:Inter,sans-serif">Ja</button>
-            <button id="rwg-nein-${i}" onclick="setFeldRWG(${i},'nein')" style="flex:1;padding:8px;font-size:12px;border:1.5px solid ${rwgSaved==='nein'?'#dc2626':'var(--border)'};border-radius:8px;background:var(--bg2);color:${rwgSaved==='nein'?'#dc2626':'var(--sub)'};cursor:pointer;font-family:Inter,sans-serif">Nein</button>
-          </div>
-          <div id="rwg-range-${i}" style="display:${rwgSaved==='ja'?'block':'none'}">
-            <div style="display:flex;gap:6px">
-              <div style="flex:1"><div style="font-size:10px;color:var(--sub);margin-bottom:3px">Von LH__</div>
-                <input type="number" id="rwg-von-${i}" value="${restoreData?.rwgVon?.[i]||''}" placeholder="1" min="1" max="12" style="background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:7px;font-size:15px;width:100%;outline:none;-webkit-appearance:none" oninput="updateSketch()"></div>
-              <div style="font-size:12px;color:var(--sub);padding-top:17px">→</div>
-              <div style="flex:1"><div style="font-size:10px;color:var(--sub);margin-bottom:3px">Bis LH__</div>
-                <input type="number" id="rwg-bis-${i}" value="${restoreData?.rwgBis?.[i]||''}" placeholder="${fe}" min="1" max="12" style="background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:7px;font-size:15px;width:100%;outline:none;-webkit-appearance:none" oninput="updateSketch()"></div>
-            </div>
-          </div>
-          <div style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.5px;margin:10px 0 5px">DURCHSCHUBSICHERUNGEN</div>
-          <div style="display:flex;gap:6px;margin-bottom:6px">
-            <button id="dsv-ja-${i}" onclick="setDSV(${i},'ja')" style="flex:1;padding:8px;font-size:12px;border:1.5px solid ${dsvSaved==='ja'?'var(--accent)':'var(--border)'};border-radius:8px;background:${dsvSaved==='ja'?'rgba(37,99,235,0.08)':'var(--bg2)'};color:${dsvSaved==='ja'?'var(--accent)':'var(--sub)'};cursor:pointer;font-family:Inter,sans-serif">Ja</button>
-            <button id="dsv-nein-${i}" onclick="setDSV(${i},'nein')" style="flex:1;padding:8px;font-size:12px;border:1.5px solid ${dsvSaved==='nein'?'#dc2626':'var(--border)'};border-radius:8px;background:var(--bg2);color:${dsvSaved==='nein'?'#dc2626':'var(--sub)'};cursor:pointer;font-family:Inter,sans-serif">Nein</button>
-          </div>
-          <div id="dsv-range-${i}" style="display:${dsvSaved==='ja'?'block':'none'}">
-            <div style="display:flex;gap:6px">
-              <div style="flex:1"><div style="font-size:10px;color:var(--sub);margin-bottom:3px">Von LH__</div>
-                <input type="number" id="dsv-von-${i}" value="${dsvVonSaved}" placeholder="1" min="1" max="12" style="background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:7px;font-size:15px;width:100%;outline:none;-webkit-appearance:none" oninput="updateSketch()"></div>
-              <div style="font-size:12px;color:var(--sub);padding-top:17px">→</div>
-              <div style="flex:1"><div style="font-size:10px;color:var(--sub);margin-bottom:3px">Bis LH__</div>
-                <input type="number" id="dsv-bis-${i}" value="${dsvBisSaved}" placeholder="${fe}" min="1" max="12" style="background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:7px;font-size:15px;width:100%;outline:none;-webkit-appearance:none" oninput="updateSketch()"></div>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    // restore dsvState
-    if(dsvSaved) dsvState[i]=dsvSaved;
-  }
-  setTimeout(()=>{
-    applyRegelm();
-    const felder2=parseInt(gv('f-felder'))||0;
-    if(!regelmaessig) for(let i=0;i<felder2;i++) updateLHInputs(i,restoreData?.lichthoehen?.[i]);
-  },0);
-}
-
-function pickEinlage(btn,val){
-  const row=btn.parentElement;
-  row.querySelectorAll('button').forEach(b=>{b.style.borderColor='var(--border)';b.style.color='var(--sub)';b.style.background='var(--bg2)';});
-  btn.style.borderColor='#4b5563';btn.style.color='#4b5563';btn.style.background='rgba(0,0,0,0.05)';
-  updateSketch();
-}
-
-function setFeldRWG(f,val){
-  const ja=document.getElementById('rwg-ja-'+f),nein=document.getElementById('rwg-nein-'+f);
-  if(ja){ja.style.borderColor=val==='ja'?'var(--accent)':'var(--border)';ja.style.color=val==='ja'?'var(--accent)':'var(--sub)';ja.style.background=val==='ja'?'rgba(37,99,235,0.08)':'var(--bg2)';}
-  if(nein){nein.style.borderColor=val==='nein'?'#dc2626':'var(--border)';nein.style.color=val==='nein'?'#dc2626':'var(--sub)';}
-  const r=document.getElementById('rwg-range-'+f);if(r)r.style.display=val==='ja'?'block':'none';
-  updateSketch();
-}
-
-function setDSV(f,val){
-  dsvState[f]=val;
-  const ja=document.getElementById('dsv-ja-'+f),nein=document.getElementById('dsv-nein-'+f);
-  if(ja){ja.style.borderColor=val==='ja'?'var(--accent)':'var(--border)';ja.style.color=val==='ja'?'var(--accent)':'var(--sub)';ja.style.background=val==='ja'?'rgba(37,99,235,0.08)':'var(--bg2)';}
-  if(nein){nein.style.borderColor=val==='nein'?'#dc2626':'var(--border)';nein.style.color=val==='nein'?'#dc2626':'var(--sub)';}
-  const r=document.getElementById('dsv-range-'+f);if(r)r.style.display=val==='ja'?'block':'none';
-  updateSketch();
-}
-
-function buildEinlagenHtml(fe, savedArr){
-  let html='';
-  for(let j=fe-1;j>=0;j--){
-    const eNum=j+1,eLabel='LH'+eNum+(j===fe-1?' (oben)':j===0?' (unten)':'');
-    const arrayIdx=fe-1-j;
-    const saved=(savedArr&&savedArr[arrayIdx])||'—';
-    const a=saved==='Einlegeboden';
-    html+=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
-      <span style="font-size:10px;color:var(--sub);min-width:54px;font-weight:600;white-space:nowrap">${eLabel}</span>
-      <button onclick="pickEinlage(this,'—')" style="flex:1;padding:6px 4px;font-size:11px;border:1.5px solid ${!a?'#0000cd':'var(--border)'};border-radius:7px;background:${!a?'rgba(0,0,205,0.06)':'var(--bg2)'};color:${!a?'#0000cd':'var(--sub)'};cursor:pointer;font-family:Inter,sans-serif">—</button>
-      <button onclick="pickEinlage(this,'Einlegeboden')" style="flex:1;padding:6px 4px;font-size:11px;border:1.5px solid ${a?'#4b5563':'var(--border)'};border-radius:7px;background:${a?'rgba(0,0,0,0.05)':'var(--bg2)'};color:${a?'#4b5563':'var(--sub)'};cursor:pointer;font-family:Inter,sans-serif">Einlegeboden</button>
-    </div>`;
-  }
-  return html;
-}
-
-function updateEinlagenInputs(f, savedArr){
-  const ebEl=document.getElementById('eb-'+f);
-  const fe=parseInt(ebEl?ebEl.value:'')||parseInt(gv('f-ebenen'))||0;
-  const inner=document.getElementById('einlagen-inner-'+f);
-  if(inner) inner.innerHTML=buildEinlagenHtml(fe, savedArr);
-}
-
-function updateLHInputs(f,restoreLH){
-  const ebEl=document.getElementById('eb-'+f);
-  const fe=parseInt(ebEl?ebEl.value:'')||parseInt(gv('f-ebenen'))||0;
-  const inner=document.getElementById('lh-inner-'+f);if(!inner)return;
-  const existing=[];for(let j=0;j<12;j++){const el=document.getElementById('lh-'+f+'-'+j);existing[j]=el?el.value:'';}
-  inner.innerHTML='';
-  for(let j=0;j<fe;j++){
-    const eNum=fe-j;const lbl='LH'+eNum+(j===0?' – oben':j===fe-1?' – unten':'');
-    const val=restoreLH?restoreLH[j]||'':existing[j]||'';
-    inner.innerHTML+=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-      <span style="font-size:9px;color:var(--sub);min-width:48px">${lbl}</span>
-      <input type="number" id="lh-${f}-${j}" value="${val}" placeholder="mm"
-        style="background:var(--bg2);border:1.5px solid var(--border);color:var(--text);border-radius:7px;padding:8px 7px;font-size:16px;font-family:'JetBrains Mono',monospace;outline:none;width:100%;-webkit-appearance:none"
-        oninput="updateSketch()">
-    </div>`;
-  }
-  // also rebuild einlagen rows to match new fe
-  updateEinlagenInputs(f, null);
-}
-
-// ── GET FIELD DATA ────────────────────────────────────────
-function getFieldData(){
-  const felder=parseInt(gv('f-felder'))||0;
-  const lichtweiten=[],felderEbenen=[],lichthoehen=[],einlagen=[],rwg=[],rwgVon=[],rwgBis=[],dsv=[],dsvVon=[],dsvBis=[];
-  for(let i=0;i<felder;i++){
-    lichtweiten.push(document.getElementById('lw-'+i)?.value?.trim()||'');
-    felderEbenen.push(document.getElementById('eb-'+i)?.value?.trim()||'');
-    const fe=parseInt(document.getElementById('eb-'+i)?.value)||parseInt(gv('f-ebenen'))||0;
-    const fLH=[];for(let j=0;j<fe;j++)fLH.push(document.getElementById('lh-'+i+'-'+j)?.value?.trim()||'');
-    lichthoehen.push(fLH);
-    if(regelmaessig){
-      // use globalBauteile for all fields
-      einlagen.push(globalBauteile.einlagen||[]);
-      rwg.push(globalBauteile.rwg?'ja':'');
-      rwgVon.push(globalBauteile.rwgVon||'');
-      rwgBis.push(globalBauteile.rwgBis||'');
-      dsv.push(globalBauteile.dsv?'ja':'');
-      dsvVon.push(globalBauteile.dsvVon||'');
-      dsvBis.push(globalBauteile.dsvBis||'');
-    } else {
-      // einlagen from per-field buttons
-      const einlInner=document.getElementById('einlagen-inner-'+i);
-      const fEinl=[];
-      if(einlInner){
-        Array.from(einlInner.children).forEach(row=>{
-          let found='—';
-          row.querySelectorAll('button').forEach(b=>{if(b.style.borderColor!=='var(--border)'&&b.style.borderColor!=='')found=b.textContent.trim();});
-          fEinl.push(found);
-        });
-      }
-      einlagen.push(fEinl);
-      const jaEl=document.getElementById('rwg-ja-'+i);
-      const rwgOn=jaEl?.style.borderColor==='var(--accent)';
-      rwg.push(rwgOn?'ja':'');
-      rwgVon.push(document.getElementById('rwg-von-'+i)?.value||'');
-      rwgBis.push(document.getElementById('rwg-bis-'+i)?.value||'');
-      dsv.push(dsvState[i]||'');
-      dsvVon.push(document.getElementById('dsv-von-'+i)?.value||'');
-      dsvBis.push(document.getElementById('dsv-bis-'+i)?.value||'');
-    }
-  }
-  return{lichtweiten,felderEbenen,lichthoehen,einlagen,rwg,rwgVon,rwgBis,dsv,dsvVon,dsvBis};
-}
-
-// ── PHOTOS ────────────────────────────────────────────────
-function handlePhotos(ev){
-  const files=Array.from(ev.target.files);
-  files.forEach(f=>{
-    const r=new FileReader();
-    r.onload=e=>{currentPhotos.push(e.target.result);renderPhotoGrid();};
-    r.readAsDataURL(f);
-  });
-}
-function removePhoto(i){currentPhotos.splice(i,1);renderPhotoGrid();}
-function renderPhotoGrid(){
-  document.getElementById('photo-grid').innerHTML=currentPhotos.map((p,i)=>
-    `<div class="photo-thumb"><img src="${p}"><button class="del-photo" onclick="removePhoto(${i})">✕</button></div>`).join('');
-}
-
-// ── GESAMTSYSTEM ──────────────────────────────────────────
-function calcGesamtsystem(){
-  const felder=parseInt(gv('f-felder'))||0,ebenen=parseInt(gv('f-ebenen'))||0;
-  const rahmH=parseFloat(gv('f-hoehe'))||0,stBr=parseFloat(gv('p-stuetze-breite'))||0;
-  const trvH=parseFloat(gv('p-traverse-hoehe'))||0,gangbr=parseFloat(gv('f-gangbreite'))||0;
-  if(!felder)return;
-  let sumFeldweiten=0;
-  if(!regelmaessig){for(let i=0;i<felder;i++){sumFeldweiten+=parseFloat(document.getElementById('lw-'+i)?.value)||parseFloat(gv('f-breite'))||0;}}
-  else{sumFeldweiten=felder*(parseFloat(gv('f-breite'))||0);}
-  const gesamtL=(felder+1)*stBr+sumFeldweiten;
-  const res=document.getElementById('gs-results'),warn=document.getElementById('gs-warnings');if(!res)return;
-  let h2='';
-  if(gesamtL>0)h2+=`<div class="gs-card"><div class="gs-label">GESAMTLÄNGE</div><div class="gs-value">${gesamtL.toLocaleString('de-CH')} mm</div></div>`;
-  if(gangbr>0)h2+=`<div class="gs-card"><div class="gs-label">GANGBREITE</div><div class="gs-value">${gangbr.toLocaleString('de-CH')} mm</div></div>`;
-  let warnHtml='';
-  if(rahmH>0&&trvH>0){
-    for(let f=0;f<felder;f++){
-      const fe=parseInt(document.getElementById('eb-'+f)?.value)||ebenen;
-      let sumFH=0;let hasFH=false;
-      for(let j=0;j<fe;j++){const v=parseFloat(document.getElementById('lh-'+f+'-'+j)?.value)||0;sumFH+=v;if(v>0)hasFH=true;}
-      if(!hasFH)continue;
-      const hBis=sumFH+fe*trvH,ueberstand=rahmH-hBis;
-      const lbl=felder>1?'Feld '+(f+1):'';
-      h2+=`<div class="gs-card" style="${ueberstand<500?'background:'.concat(ueberstand<0?'#fef2f2':'#fef9c3'):''};border-color:${ueberstand<0?'#fca5a5':ueberstand<500?'#f59e0b':'var(--border)'}"><div class="gs-label">ÜBERSTAND${lbl?' '+lbl:''}</div><div class="gs-value" style="color:${ueberstand<0?'#dc2626':ueberstand<500?'#b45309':'var(--text)'}">${Math.round(ueberstand)} mm</div></div>`;
-      if(ueberstand<0)warnHtml+=`<div class="warn-box danger"><span style="font-size:20px">🚨</span><div><div style="font-weight:700;color:#dc2626;font-size:13px">${lbl?lbl+': ':''}Rahmenhöhe überschritten!</div><div style="font-size:12px;color:#991b1b;margin-top:3px">Belegter Bereich ${Math.round(hBis)} mm > Rahmen ${rahmH} mm</div></div></div>`;
-      else if(ueberstand<500)warnHtml+=`<div class="warn-box caution"><span style="font-size:20px">⚠️</span><div><div style="font-weight:700;color:#b45309;font-size:13px">${lbl?lbl+': ':''}Achtung. Seitliche Herabfallsicherung nicht erfüllt.</div><div style="font-size:12px;color:#92400e;margin-top:3px">Überstand ${Math.round(ueberstand)} mm — mind. 500 mm benötigt</div></div></div>`;
-    }
-  }
-  res.innerHTML=h2;warn.innerHTML=warnHtml;
-  const glEl=document.getElementById('f-gesamtlaenge');if(glEl&&gesamtL>0)glEl.value=Math.round(gesamtL);
-}
 
 // ── SKETCH ────────────────────────────────────────────────
-function updateSketch(){
-  const felder=Math.min(Math.max(parseInt(gv('f-felder'))||3,1),12);
-  const ebenen=Math.min(Math.max(parseInt(gv('f-ebenen'))||4,1),10);
-  const fd=getFieldData();
-  const canvas=document.getElementById('regal-sketch');if(!canvas)return;
-  const dpr=window.devicePixelRatio||1,W=canvas.parentElement.clientWidth-24,H=200;
-  canvas.width=W*dpr;canvas.height=H*dpr;
-  canvas.style.width=W+'px';canvas.style.height=H+'px';
-  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-  drawRegal(ctx,felder,ebenen,fd,toggleState.anbau==='ja',W,H);
+let sketchHeightMode='auto';
+let sketchViewMode='iso';
+
+function getSketchH(ebenen){
+  if(sketchHeightMode==='compact') return 160;
+  if(sketchHeightMode==='tall') return 360;
+  // auto: based on ebenen count
+  return Math.max(180, 60 + Math.max(parseInt(ebenen)||4, 1)*52 + 32);
 }
 
-function drawRegal(ctx,felder,ebenen,fd,isAnbau,W,H){
+function setSketchH(mode, btn){
+  sketchHeightMode=mode;
+  // only toggle height buttons
+  ['sk-auto-btn','sk-compact-btn','sk-tall-btn'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.remove('active');
+  });
+  btn.classList.add('active');
+  updateSketch();
+}
+
+function toggleSketchVisible(show){
+  const wrap=document.getElementById('sk-canvas-wrap');
+  if(wrap) wrap.style.display=show?'block':'none';
+}
+
+function setSketchView(mode, btn){
+  sketchViewMode=mode;
+  ['sk-iso-btn','sk-2d-btn'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.remove('active');
+  });
+  btn.classList.add('active');
+  updateSketch();
+}
+
+function openSketchOverlay(){
+  const ov=document.getElementById('sk-overlay');
+  if(ov){ov.style.display='flex';setTimeout(()=>drawSketchOnCanvas('regal-sketch-overlay'),60);}
+}
+function closeSketchOverlay(){
+  const ov=document.getElementById('sk-overlay');
+  if(ov) ov.style.display='none';
+}
+
+function drawSketchOnCanvas(canvasId){
+  const canvas=document.getElementById(canvasId);if(!canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const parentW=canvas.parentElement?canvas.parentElement.clientWidth:0;
+  const W=Math.max(parentW-8,280);
+  const ebenen=Math.min(Math.max(parseInt(gv('f-ebenen'))||4,1),10);
+  const H=canvasId==='regal-sketch-overlay'?Math.max(420,getSketchH(ebenen)*1.8):getSketchH(ebenen);
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const wrap=document.getElementById('sk-canvas-wrap');
+  if(wrap&&canvasId==='regal-sketch') wrap.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  if(regalAbschnitte&&regalAbschnitte.length>0){
+    drawRegalMitAbschnitten(ctx,W,H);
+    return;
+  }
+  const felder=Math.min(Math.max(parseInt(gv('f-felder'))||3,1),12);
+  const lichtweiten=[],felderEbenen=[],lichthoehen=[],einlagen=[],rwg=[],rwgVon=[],rwgBis=[],dsv=[],dsvVon=[],dsvBis=[];
+  for(let i=0;i<felder;i++){
+    lichtweiten.push(document.getElementById('lw-'+i)?.value||'');
+    felderEbenen.push(document.getElementById('eb-'+i)?.value||'');
+    const fe2=parseInt(document.getElementById('eb-'+i)?.value)||ebenen;
+    const fLH=[];for(let j=0;j<fe2;j++)fLH.push(document.getElementById('lh-'+i+'-'+j)?.value||'');
+    lichthoehen.push(fLH);
+    const einlEl=document.getElementById('einlagen-inner-'+i);
+    const fEinl=[];
+    if(einlEl)Array.from(einlEl.children).forEach(row=>{let v='—';row.querySelectorAll('button').forEach(b=>{if(b.style.borderColor&&b.style.borderColor!=='var(--border)'&&b.style.borderColor!=='')v=b.textContent.trim();});fEinl.push(v);});
+    einlagen.push(fEinl);
+    const rja=document.getElementById('rwg-ja-'+i);
+    rwg.push(rja?.style.borderColor==='var(--accent)'?'ja':'');
+    rwgVon.push(document.getElementById('rwg-von-'+i)?.value||'');
+    rwgBis.push(document.getElementById('rwg-bis-'+i)?.value||'');
+    dsv.push(dsvState[i]||'');
+    dsvVon.push(document.getElementById('dsv-von-'+i)?.value||'');
+    dsvBis.push(document.getElementById('dsv-bis-'+i)?.value||'');
+  }
+  const fd={lichtweiten,felderEbenen,lichthoehen,einlagen,rwg,rwgVon,rwgBis,dsv,dsvVon,dsvBis};
+  if(sketchViewMode==='2d'){
+    drawRegal2D(ctx,felder,ebenen,fd,W,H);
+  } else {
+    drawRegal(ctx,felder,ebenen,fd,toggleState.anbau==='ja',W,H);
+  }
+}
+
+function drawRegal2D(ctx,felder,ebenen,fd,W,H){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f0f4f8';ctx.fillRect(0,0,W,H);
+  const PL=36,PR=16,PT=24,PB=24;
+  const rW=W-PL-PR,rH=H-PT-PB;
+  const lws=(fd.lichtweiten||[]).map(l=>parseFloat(l)||0);
+  const totLW=lws.reduce((a,b)=>a+b,0);
+  const fw=totLW>0?lws.map(l=>(l/totLW)*rW):Array(felder).fill(rW/felder);
+  const fx_=[0];for(let i=0;i<felder;i++)fx_.push(fx_[i]+fw[i]);
+  const UW=Math.max(3,Math.min(6,rW/felder/7));
+  const TH=Math.max(3,Math.min(6,rH/ebenen/6));
+
+  // Ständer
+  for(let s=0;s<=felder;s++){
+    ctx.fillStyle='#1a3a8f';
+    ctx.fillRect(PL+fx_[s]-UW/2,PT,UW,rH);
+    // Lochprofil
+    ctx.fillStyle='#4a70d8';
+    for(let y=PT+8;y<PT+rH-4;y+=Math.max(8,rH/ebenen/2)){
+      ctx.fillRect(PL+fx_[s]-UW/2+1,y,UW-2,3);
+    }
+  }
+
+  // Traversen per Feld
+  for(let f=0;f<felder;f++){
+    const fe=parseInt((fd.felderEbenen||[])[f])||ebenen;
+    // Use proportional LH heights if available
+    const fLHraw=((fd.lichthoehen||[])[f]||[]).map(v=>parseFloat(v)||0);
+    const totFLH=fLHraw.reduce((a,b)=>a+b,0);
+    const fLH=totFLH>0?fLHraw:Array(fe).fill(1);
+    const totNorm=fLH.reduce((a,b)=>a+b,0);
+    const fy2_=[0];for(let k=0;k<fe;k++)fy2_.push(fy2_[k]+(fLH[k]/totNorm)*rH);
+    for(let e=0;e<fe;e++){
+      // Single traverse: center it vertically
+      const y=fe===1?PT+rH/2:PT+fy2_[e];
+      const fh=fy2_[e+1]-fy2_[e];
+      const x1=PL+fx_[f]+UW/2;
+      const x2=PL+fx_[f+1]-UW/2;
+      // Traverse Hohlkastenprofil
+      ctx.fillStyle='#fdba74';
+      ctx.fillRect(x1,y-TH*0.4,x2-x1,TH*0.5); // Oberkante
+      ctx.fillStyle='#f97316';
+      ctx.fillRect(x1,y-TH*0.4,x2-x1,TH);     // Front
+      ctx.fillStyle='#c2410c';
+      ctx.fillRect(x1,y+TH*0.6,x2-x1,TH*0.4); // Unterkante
+      // Hakenlaschen links
+      ctx.fillStyle='#f97316';
+      ctx.fillRect(x1-5,y-TH*0.6,5,TH*1.4);
+      ctx.fillStyle='#c2410c';
+      ctx.fillRect(x1-4,y-TH*0.1,3,3);ctx.fillRect(x1-4,y+TH*0.5,3,3);
+      // Hakenlaschen rechts
+      ctx.fillStyle='#f97316';
+      ctx.fillRect(x2,y-TH*0.6,5,TH*1.4);
+      ctx.fillStyle='#c2410c';
+      ctx.fillRect(x2+1,y-TH*0.1,3,3);ctx.fillRect(x2+1,y+TH*0.5,3,3);
+    }
+    // Einlegeboden – draw at correct proportional height
+    const einlArr=(fd.einlagen||[])[f]||[];
+    einlArr.forEach((v,arrIdx)=>{
+      if(v==='Einlegeboden'){
+        const ey=PT+fy2_[arrIdx]+TH*1.2;
+        ctx.fillStyle='rgba(160,165,172,0.75)';
+        ctx.fillRect(PL+fx_[f]+UW/2,ey,fw[f]-UW,3);
+        ctx.fillStyle='rgba(130,135,143,0.5)';
+        ctx.fillRect(PL+fx_[f]+UW/2,ey+3,fw[f]-UW,2);
+      }
+    });
+    // LH labels on left side of first field
+    if(f===0){
+      ctx.font='bold 7px JetBrains Mono,monospace';
+      ctx.textAlign='right';
+      for(let e=0;e<fe;e++){
+        const midY=PT+(fy2_[e]+fy2_[e+1])/2;
+        const lhVal=fLHraw[e]?Math.round(fLHraw[e])+'mm':'LH'+(fe-e);
+        ctx.fillStyle='rgba(100,116,139,0.7)';
+        ctx.fillText(lhVal,PL-3,midY+3);
+      }
+      ctx.textAlign='left';
+    }
+  }
+
+  // RWG
+  for(let f=0;f<felder;f++){
+    if((fd.rwg||[])[f]==='ja'){
+      const feR=parseInt((fd.felderEbenen||[])[f])||ebenen;
+      const fLHrR=((fd.lichthoehen||[])[f]||[]).map(v=>parseFloat(v)||0);
+      const totR=fLHrR.reduce((a,b)=>a+b,0);
+      const fLHR=totR>0?fLHrR:Array(feR).fill(1);
+      const totNR=fLHR.reduce((a,b)=>a+b,0);
+      const fyR=[0];for(let k=0;k<feR;k++)fyR.push(fyR[k]+(fLHR[k]/totNR)*rH);
+      const vonLH=parseInt((fd.rwgVon||[])[f])||1;
+      const bisLH=parseInt((fd.rwgBis||[])[f])||feR;
+      const y1=PT+fyR[vonLH-1]+TH;
+      const y2=PT+fyR[bisLH]-TH;
+      ctx.fillStyle='rgba(22,163,74,0.18)';
+      ctx.fillRect(PL+fx_[f]+UW/2,y1,fw[f]-UW,y2-y1);
+      ctx.strokeStyle='rgba(22,163,74,0.5)';ctx.lineWidth=1;ctx.setLineDash([3,2]);
+      ctx.strokeRect(PL+fx_[f]+UW/2,y1,fw[f]-UW,y2-y1);
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(22,163,74,0.8)';ctx.font='bold 7px Inter,Arial,sans-serif';ctx.textAlign='center';
+      ctx.fillText('RWG',PL+(fx_[f]+fx_[f+1])/2,y1+9);
+    }
+  }
+
+  // DSV
+  for(let f=0;f<felder;f++){
+    if((fd.dsv||[])[f]==='ja'){
+      const feD=parseInt((fd.felderEbenen||[])[f])||ebenen;
+      const fLHrD=((fd.lichthoehen||[])[f]||[]).map(v=>parseFloat(v)||0);
+      const totD=fLHrD.reduce((a,b)=>a+b,0);
+      const fLHD=totD>0?fLHrD:Array(feD).fill(1);
+      const totND=fLHD.reduce((a,b)=>a+b,0);
+      const fyD=[0];for(let k=0;k<feD;k++)fyD.push(fyD[k]+(fLHD[k]/totND)*rH);
+      const vonLH=parseInt((fd.dsvVon||[])[f])||1;
+      const bisLH=parseInt((fd.dsvBis||[])[f])||feD;
+      const y1=PT+fyD[vonLH-1]+TH;
+      const y2=PT+fyD[bisLH]-TH;
+      ctx.fillStyle='rgba(124,58,237,0.12)';
+      ctx.fillRect(PL+fx_[f]+UW/2,y1,fw[f]-UW,y2-y1);
+      ctx.strokeStyle='rgba(124,58,237,0.4)';ctx.lineWidth=1;ctx.setLineDash([3,2]);
+      ctx.strokeRect(PL+fx_[f]+UW/2,y1,fw[f]-UW,y2-y1);
+      ctx.setLineDash([]);
+      ctx.fillStyle='#7c3aed';ctx.font='bold 7px Inter,Arial,sans-serif';ctx.textAlign='center';
+      ctx.fillText('DSV',PL+(fx_[f]+fx_[f+1])/2,y1+9);
+    }
+  }
+
+  // Feldnummern unten
+  ctx.font='bold 8px Inter,Arial,sans-serif';ctx.textAlign='center';ctx.fillStyle='rgba(37,99,235,0.65)';
+  for(let f=0;f<felder;f++) ctx.fillText('F'+(f+1),PL+(fx_[f]+fx_[f+1])/2,PT+rH+16);
+  ctx.textAlign='left';
+  ctx.fillStyle='#334155';ctx.font='bold 8px JetBrains Mono,monospace';
+  ctx.fillText(felder+(felder>1?' Felder':' Feld')+'  '+ebenen+(ebenen>1?' Ebenen':' Ebene'),PL,PT-8);
+}
+
+function updateSketch(){
+  drawSketchOnCanvas('regal-sketch');
+}
+
+function drawRegalMitAbschnitten(ctx,W,H){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f0f4f8';ctx.fillRect(0,0,W,H);
+  const secs=regalAbschnitte;
+  const n=secs.length;if(!n)return;
+
+  // All sections are normal (no parallel groups)
+  const groups=secs.map(s=>({type:'normal',secs:[s],w:Math.max(parseInt(s.felder)||3,1)}));
+
+  const SEP=14,ng=groups.length;
+  const totalWt=groups.reduce((a,g)=>a+g.w,0);
+  const totalW=W-SEP*(ng-1);
+  const gWidths=groups.map(g=>Math.floor((g.w/totalWt)*totalW));
+  // Get full field data so einlagen/RWG/DSV are available per field
+  const fdAll=getFieldData();
+  let fieldOffset=0,gx=0;
+
+  groups.forEach((grp,gi)=>{
+    const gw=gWidths[gi];
+    const sec=grp.secs[0];
+    const felder=Math.min(Math.max(parseInt(sec.felder)||3,1),12);
+    const ebenen=Math.min(Math.max(parseInt(sec.ebenen)||parseInt(gv('f-ebenen'))||4,1),10);
+    // Slice fd arrays for this section's fields (fieldOffset .. fieldOffset+felder)
+    const slice=(arr)=>(arr||[]).slice(fieldOffset, fieldOffset+felder);
+    const fdSec={
+      lichtweiten:slice(fdAll.lichtweiten),
+      felderEbenen:slice(fdAll.felderEbenen),
+      lichthoehen:slice(fdAll.lichthoehen),
+      einlagen:slice(fdAll.einlagen),
+      rwg:slice(fdAll.rwg),
+      rwgVon:slice(fdAll.rwgVon),
+      rwgBis:slice(fdAll.rwgBis),
+      dsv:slice(fdAll.dsv),
+      dsvVon:slice(fdAll.dsvVon),
+      dsvBis:slice(fdAll.dsvBis),
+    };
+    ctx.save();ctx.translate(gx,0);ctx.beginPath();ctx.rect(0,0,gw,H);ctx.clip();
+    if(sketchViewMode==='2d'){drawRegal2D(ctx,felder,ebenen,fdSec,gw,H);}else{drawRegal(ctx,felder,ebenen,fdSec,false,gw,H,fieldOffset);}
+    ctx.restore();
+    fieldOffset+=felder;
+    // Separator
+    if(gi<ng-1){
+      const sx=gx+gw;
+      const nextTrenn=groups[gi+1].secs[0].trenngrund||'Lücke';
+      ctx.save();
+      if(nextTrenn==='Stütze'){
+        ctx.fillStyle='#1a52d4';ctx.fillRect(sx,6,SEP,H-12);
+        ctx.fillStyle='#1244a8';
+        for(let y=12;y<H-12;y+=9)ctx.fillRect(sx+3,y,SEP-6,5);
+      } else if(nextTrenn==='Wand'){
+        ctx.fillStyle='#94a3b8';ctx.fillRect(sx,6,SEP,H-12);
+        ctx.strokeStyle='#64748b';ctx.lineWidth=0.8;
+        for(let y=12;y<H-12;y+=5){ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx+SEP,y);ctx.stroke();}
+      } else if(nextTrenn==='Lücke'){
+        ctx.setLineDash([4,3]);ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(sx+SEP/2,10);ctx.lineTo(sx+SEP/2,H-10);ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      const lbl=nextTrenn==='Stütze'?'S':nextTrenn==='Wand'?'W':nextTrenn==='Lücke'?'L':'';
+      if(lbl){ctx.fillStyle='rgba(71,85,105,0.8)';ctx.font='bold 8px Inter,Arial,sans-serif';ctx.textAlign='center';ctx.fillText(lbl,sx+SEP/2,H-2);}
+      ctx.restore();
+    }
+    gx+=gw+SEP;
+  });
+}
+
+// drawFieldLabels removed – labels now drawn inside drawRegal
+
+function drawRegal(ctx,felder,ebenen,fd,isAnbau,W,H,fieldOffset){
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#f0f4f8';ctx.fillRect(0,0,W,H);
   const CUF='#1a3a8f',CUS='#102878',CUT='#2d52b8',CUH='#4a70d8';
@@ -3875,10 +4216,11 @@ function drawRegal(ctx,felder,ebenen,fd,isAnbau,W,H){
     ctx.beginPath();ctx.moveTo(FX(ux+UW/2),FY(rH));ctx.lineTo(IX(ux+UW/2,FD),IY(rH,FD));ctx.stroke();
   }
   // Einlegeböden (behind traverses)
+  const _foff=typeof fieldOffset==='number'?fieldOffset:0;
   for(let f=0;f<felder;f++){
     const{fe,fy_}=getFieldLevels(f);
     const x1=fx_[f]+UW/2,x2=fx_[f+1]-UW/2,gw=x2-x1;
-    const einlInner=document.getElementById('einlagen-inner-'+f);
+    const einlInner=document.getElementById('einlagen-inner-'+(_foff+f));
     if(!einlInner)continue;
     const rows=Array.from(einlInner.children);
     rows.forEach((row,arrayIdx)=>{
@@ -3912,8 +4254,8 @@ function drawRegal(ctx,felder,ebenen,fd,isAnbau,W,H){
     const jaEl=document.getElementById('rwg-ja-'+f);
     if(!jaEl||jaEl.style.borderColor!=='var(--accent)')continue;
     const{fe,fy_}=getFieldLevels(f);
-    const von=Math.max(1,parseInt(document.getElementById('rwg-von-'+f)?.value)||1);
-    const bis=Math.min(fe,parseInt(document.getElementById('rwg-bis-'+f)?.value)||fe);
+    const von=Math.max(1,parseInt(document.getElementById('rwg-von-'+(_foff+f))?.value)||1);
+    const bis=Math.min(fe,parseInt(document.getElementById('rwg-bis-'+(_foff+f))?.value)||fe);
     const x1=fx_[f]+UW/2,x2=fx_[f+1]-UW/2;
     const lvTop=fe-bis,lvBot=fe-von;
     const ry1=IY(fy_[Math.max(0,lvTop)],FD),ry2=IY(fy_[Math.min(fe,lvBot+1)],FD);
@@ -4057,6 +4399,21 @@ function drawRegal(ctx,felder,ebenen,fd,isAnbau,W,H){
   // Title
   ctx.fillStyle='#334155';ctx.font='bold 8px JetBrains Mono,monospace';
   ctx.fillText((isAnbau?'⊏ Anbau  ':'')+felder+(felder>1?' Felder':' Feld')+'  '+ebenen+(ebenen>1?' Ebenen':' Ebene'),PL,PT-8);
+  // Field number labels at bottom of sketch
+  if(typeof fieldOffset==='number'){
+    ctx.font='bold 7px Inter,Arial,sans-serif';
+    ctx.textAlign='center';
+    for(let fi=0;fi<felder;fi++){
+      const midX=FX((fx_[fi]+fx_[fi+1])/2);
+      const botY=FY(rH)+12;
+      ctx.fillStyle='rgba(37,99,235,0.15)';
+      const lw2=ctx.measureText('F'+(fieldOffset+fi+1)).width;
+      ctx.fillRect(midX-lw2/2-3,botY-8,lw2+6,11);
+      ctx.fillStyle='#1e40af';
+      ctx.fillText('F'+(fieldOffset+fi+1),midX,botY);
+    }
+    ctx.textAlign='left';
+  }
   // Legend
   const leg=[{c:CUF,l:'Stütze'},{c:CTF,l:'Traverse'},{c:'#7c3aed',l:'DSV'},{c:'rgba(22,163,74,0.8)',l:'RWG'}];
   ctx.font='7px Inter,sans-serif';let lx=PL;
@@ -4173,10 +4530,38 @@ window.addEventListener('resize',()=>{if(document.getElementById('screen-form').
 
 <!-- INSPEKTION LIST -->
 <div class="screen" id="screen-inspektion-list">
+  <p class="page-title">Inspektion</p>
+  <p class="page-sub">Was möchtest du durchführen?</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px">
+    <div onclick="showScreen('insp-list-view')" style="background:var(--bg2);border:1.5px solid var(--accent);border-radius:14px;padding:20px 16px;cursor:pointer;text-align:center;transition:all .15s" onmouseover="this.style.background='rgba(0,0,205,0.06)'" onmouseout="this.style.background='var(--bg2)'">
+      <div style="font-size:32px;margin-bottom:10px">🔍</div>
+      <div style="font-size:14px;font-weight:700;color:var(--accent)">Inspektion</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:4px">Regalinspektion starten</div>
+    </div>
+    <div onclick="toast('Platzhalter 2 – kommt bald')" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;cursor:pointer;text-align:center;transition:all .15s;opacity:.7" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:32px;margin-bottom:10px">📋</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">Platzhalter 2</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:4px">Folgt in Phase 2</div>
+    </div>
+    <div onclick="toast('Platzhalter 3 – kommt bald')" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;cursor:pointer;text-align:center;transition:all .15s;opacity:.7" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:32px;margin-bottom:10px">📊</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">Platzhalter 3</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:4px">Folgt in Phase 3</div>
+    </div>
+    <div onclick="toast('Platzhalter 4 – kommt bald')" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;cursor:pointer;text-align:center;transition:all .15s;opacity:.7" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:32px;margin-bottom:10px">🗂</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">Platzhalter 4</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:4px">Folgt in Phase 4</div>
+    </div>
+  </div>
+</div>
 
-
-  <p class="page-title" id="insp-page-title">Inspektionen</p>
-  <p class="page-sub">Regalinspektionen & Prüfberichte</p>
+<!-- INSPEKTION SUB-LIST -->
+<div class="screen" id="screen-insp-list-view">
+  <div class="form-header">
+    <button class="back-btn" onclick="showScreen('inspektion-list')">← Zurück</button>
+    <span style="font-size:15px;font-weight:700">Inspektionen</span>
+  </div>
   <button class="btn btn-accent" onclick="newInspektion()" style="width:100%;margin-bottom:16px">+ Neue Inspektion starten</button>
   <div id="insp-list"></div>
 </div>
@@ -4184,7 +4569,7 @@ window.addEventListener('resize',()=>{if(document.getElementById('screen-form').
 <!-- INSPEKTION FORM -->
 <div class="screen" id="screen-insp-form">
   <div class="form-header">
-    <button class="back-btn" onclick="switchTab('inspektion')">← Zurück</button>
+    <button class="back-btn" onclick="showScreen('insp-list-view')">← Zurück</button>
     <span style="font-size:15px;font-weight:700" id="insp-form-title">Neue Inspektion</span>
   </div>
   <div class="section-block">
