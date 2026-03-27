@@ -39,6 +39,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(245,247,250,.94);backdrop-
 .nav-btn.primary{background:var(--accent);color:#fff;padding:7px 14px}
 .screen{display:none;padding:16px 16px 100px;max-width:800px;margin:0 auto}
 .form-grid-2x2{display:block}
+@media(max-width:600px){
+  .at-item-grid{grid-template-columns:1fr!important;}
+  .at-item-grid>div:last-child{display:none}
+}
 @media(min-width:900px){
   .form-grid-2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:16px}
   .fg-r1c1{grid-column:1;grid-row:1}
@@ -824,23 +828,18 @@ function applyEckSet(arr){
   });
 }
 
-function updateATSketch(typ){
-  const item2 = atItems.find(x=>x.typ===typ)||{};
-  switchATSketch2(item2.id, typ, item2._sketch||(typ==='Einlegeboden'?'stahlblech':typ==='Rückwandgitter'||typ==='Durchschubsicherung'?'gitterrost':'holz'));
-  return;
-  const id = typ.replace(/[^a-z]/gi,'');
-  const item = atItems.find(x=>x.typ===typ)||{};
-  const sketchEl = document.getElementById('at-sketch-'+id);
-  if(!sketchEl) return;
-  // Find active sketch key from active button
-  const btnsWrap = sketchEl.previousElementSibling;
-  let activeKey = 'stahlblech';
-  if(btnsWrap) btnsWrap.querySelectorAll('button').forEach(btn=>{
-    if(btn.style.color && btn.style.color.includes('accent') || btn.style.fontWeight==='600') activeKey = btn.textContent.toLowerCase().includes('gitter')?'gitterrost':btn.textContent.toLowerCase().includes('holz')?'holz':'stahlblech';
-  });
-  const L = item.laenge ? item.laenge+' mm' : '';
-  const B = item.breite ? item.breite+' mm' : '';
-  sketchEl.innerHTML = AT_SKETCHES[activeKey](id, L, B);
+function updateATSketch(id){
+  const item = atItems.find(x=>x.id===id);
+  if(!item) return;
+  const el = document.getElementById('at-sketch-'+id);
+  if(!el) return;
+  const bk = BAUTEIL_SKETCH_MAP[item.typ];
+  if(bk && BAUTEIL_SKETCHES[bk]){
+    el.innerHTML = BAUTEIL_SKETCHES[bk](id);
+  } else {
+    const sk = item._sketch||'stahlblech';
+    el.innerHTML = AT_SKETCHES[sk](id, item.laenge||'', item.breite||'');
+  }
 }
 function setToggle(key,val){
   toggleState[key]=val;
@@ -1004,14 +1003,214 @@ const AT_SKETCHES={
   </svg>`
 };
 
+// ── BAUTEIL-SKIZZEN (ISO) ────────────────────────────────
+const BAUTEIL_SKETCHES = {
+
+  rueckwandgitter: (id) => `<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 280">
+    <rect x="83" y="43" width="494" height="194" fill="#dde3ea"/>
+    <rect x="80" y="40" width="500" height="2.5" fill="#7a8896"/>
+    <polygon points="80,40 83,37 583,37 580,40" fill="#8c9ba8"/>
+    <rect x="80" y="237" width="500" height="2.5" fill="#7a8896"/>
+    <polygon points="80,239.5 83,236.5 583,236.5 580,239.5" fill="#8c9ba8"/>
+    <rect x="80" y="40" width="2.5" height="199.5" fill="#7a8896"/>
+    <polygon points="80,40 82.5,40 82.5,239.5 80,239.5" fill="#8a9baa"/>
+    <rect x="577.5" y="40" width="2.5" height="199.5" fill="#7a8896"/>
+    <polygon points="580,40 583,37 583,236.5 580,239.5" fill="#8a9baa"/>
+    <polygon points="80,40 580,40 580,239.5 80,239.5" fill="none" stroke="#6b7a87" stroke-width="0.8"/>
+    <line x1="82.5" y1="54"  x2="577.5" y2="54"  stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="68"  x2="577.5" y2="68"  stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="82"  x2="577.5" y2="82"  stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="96"  x2="577.5" y2="96"  stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="110" x2="577.5" y2="110" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="124" x2="577.5" y2="124" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="138" x2="577.5" y2="138" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="152" x2="577.5" y2="152" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="166" x2="577.5" y2="166" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="180" x2="577.5" y2="180" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="194" x2="577.5" y2="194" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="208" x2="577.5" y2="208" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="82.5" y1="222" x2="577.5" y2="222" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="97"  y1="42.5" x2="97"  y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="111" y1="42.5" x2="111" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="125" y1="42.5" x2="125" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="139" y1="42.5" x2="139" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="153" y1="42.5" x2="153" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="167" y1="42.5" x2="167" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="181" y1="42.5" x2="181" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="195" y1="42.5" x2="195" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="209" y1="42.5" x2="209" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="223" y1="42.5" x2="223" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="237" y1="42.5" x2="237" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="251" y1="42.5" x2="251" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="265" y1="42.5" x2="265" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="279" y1="42.5" x2="279" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="293" y1="42.5" x2="293" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="307" y1="42.5" x2="307" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="321" y1="42.5" x2="321" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="335" y1="42.5" x2="335" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="349" y1="42.5" x2="349" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="363" y1="42.5" x2="363" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="377" y1="42.5" x2="377" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="391" y1="42.5" x2="391" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="405" y1="42.5" x2="405" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="419" y1="42.5" x2="419" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="433" y1="42.5" x2="433" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="447" y1="42.5" x2="447" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="461" y1="42.5" x2="461" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="475" y1="42.5" x2="475" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="489" y1="42.5" x2="489" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="503" y1="42.5" x2="503" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="517" y1="42.5" x2="517" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="531" y1="42.5" x2="531" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="545" y1="42.5" x2="545" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="559" y1="42.5" x2="559" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+    <line x1="573" y1="42.5" x2="573" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
+  </svg>`,
+
+  anfahrschutz: (id) => `<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 280">
+    <defs>
+      <pattern id="pF${id}" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="11" height="22" fill="#fbbf24"/><rect x="11" width="11" height="22" fill="#1f2937"/>
+      </pattern>
+      <pattern id="pS${id}" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="11" height="22" fill="#d4960a"/><rect x="11" width="11" height="22" fill="#181e2a"/>
+      </pattern>
+      <clipPath id="cpF${id}"><rect x="290" y="50" width="100" height="180"/></clipPath>
+      <clipPath id="cpL${id}"><polygon points="290,50 254,30 254,210 290,230"/></clipPath>
+      <clipPath id="cpR${id}"><polygon points="390,50 426,30 426,210 390,230"/></clipPath>
+    </defs>
+    <!-- Linker Schenkel geht nach links-hinten (ISO: -36px, -20px) -->
+    <polygon points="290,50 254,30 254,210 290,230" fill="url(#pS${id})" clip-path="url(#cpL${id})"/>
+    <polygon points="290,50 254,30 254,35 290,55" fill="url(#pS${id})"/>
+    <polygon points="290,50 254,30 254,35 290,55" fill="none" stroke="#374151" stroke-width="0.8"/>
+    <line x1="290" y1="230" x2="254" y2="210" stroke="#374151" stroke-width="1.5"/>
+    <line x1="254" y1="30" x2="254" y2="210" stroke="#374151" stroke-width="1.5"/>
+    <polygon points="290,50 254,30 254,210 290,230" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <!-- Rechter Schenkel geht nach rechts-hinten (ISO: +36px, -20px) -->
+    <polygon points="390,50 426,30 426,210 390,230" fill="url(#pS${id})" clip-path="url(#cpR${id})"/>
+    <polygon points="390,50 426,30 426,35 390,55" fill="url(#pS${id})"/>
+    <polygon points="390,50 426,30 426,35 390,55" fill="none" stroke="#374151" stroke-width="0.8"/>
+    <line x1="390" y1="230" x2="426" y2="210" stroke="#374151" stroke-width="1.5"/>
+    <line x1="426" y1="30" x2="426" y2="210" stroke="#374151" stroke-width="1.5"/>
+    <polygon points="390,50 426,30 426,210 390,230" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <!-- Oberkante ISO (verbindet alle drei Flächen) -->
+    <polygon points="254,30 290,50 390,50 426,30" fill="url(#pF${id})"/>
+    <polygon points="254,30 290,50 390,50 426,30" fill="none" stroke="#374151" stroke-width="1"/>
+    <!-- Frontfläche -->
+    <rect x="290" y="50" width="100" height="180" fill="url(#pF${id})" clip-path="url(#cpF${id})"/>
+    <line x1="290" y1="230" x2="390" y2="230" stroke="#374151" stroke-width="1.5"/>
+    <rect x="290" y="50" width="100" height="180" fill="none" stroke="#374151" stroke-width="1.5"/>
+  </svg>`,
+
+  eckschutz: (id) => `<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 280">
+    <defs>
+      <pattern id="wf${id}" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+        <rect width="10" height="20" fill="#1f2937"/><rect x="10" width="10" height="20" fill="#fbbf24"/>
+      </pattern>
+      <pattern id="ws${id}" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+        <rect width="10" height="20" fill="#1a2030"/><rect x="10" width="10" height="20" fill="#e5a800"/>
+      </pattern>
+      <clipPath id="cpfE${id}"><polygon points="170,60 310,60 310,238 170,238"/></clipPath>
+      <clipPath id="cpsE${id}"><polygon points="310,60 370,36 370,214 310,238"/></clipPath>
+    </defs>
+    <polygon points="170,60 310,60 310,238 170,238" fill="url(#wf${id})" clip-path="url(#cpfE${id})"/>
+    <polygon points="170,60 180,54 180,232 170,238" fill="url(#wf${id})"/>
+    <polygon points="170,60 180,54 180,232 170,238" fill="none" stroke="#374151" stroke-width="0.8"/>
+    <polygon points="170,60 310,60 320,54 180,54" fill="url(#wf${id})"/>
+    <polygon points="170,60 310,60 320,54 180,54" fill="none" stroke="#374151" stroke-width="0.6"/>
+    <line x1="170" y1="238" x2="310" y2="238" stroke="#374151" stroke-width="1.5"/>
+    <polygon points="170,60 310,60 310,238 170,238" fill="none" stroke="#374151" stroke-width="1.5"/>
+    <polygon points="310,60 370,36 370,214 310,238" fill="url(#ws${id})" clip-path="url(#cpsE${id})"/>
+    <line x1="370" y1="36" x2="370" y2="214" stroke="#374151" stroke-width="1.5"/>
+    <polygon points="310,60 370,36 370,40 310,64" fill="url(#ws${id})"/>
+    <polygon points="310,60 370,36 370,40 310,64" fill="none" stroke="#374151" stroke-width="0.6"/>
+    <line x1="310" y1="238" x2="370" y2="214" stroke="#374151" stroke-width="1.5"/>
+    <polygon points="310,60 370,36 370,214 310,238" fill="none" stroke="#374151" stroke-width="1.5"/>
+  </svg>`,
+
+  leitplanke: (id) => `<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 280">
+    <rect x="60" y="250" width="560" height="6" rx="2" fill="#d1d5db"/>
+    <rect x="96" y="140" width="22" height="112" rx="3" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/>
+    <polygon points="118,140 142,130 142,244 118,252" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+    <polygon points="96,140 118,140 142,130 120,130" fill="#fcd34d" stroke="#d97706" stroke-width="0.8"/>
+    <rect x="498" y="140" width="22" height="112" rx="3" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/>
+    <polygon points="520,140 544,130 544,244 520,252" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+    <polygon points="498,140 520,140 544,130 522,130" fill="#fcd34d" stroke="#d97706" stroke-width="0.8"/>
+    <polygon points="96,152 520,152 544,142 122,142" fill="#fcd34d" stroke="#d97706" stroke-width="1.2"/>
+    <polygon points="96,152 96,168 520,168 520,152" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/>
+    <polygon points="520,152 544,142 544,158 520,168" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+    <polygon points="96,184 520,184 544,174 122,174" fill="#fcd34d" stroke="#d97706" stroke-width="1.2"/>
+    <polygon points="96,184 96,200 520,200 520,184" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/>
+    <polygon points="520,184 544,174 544,190 520,200" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+  </svg>`,
+
+  durchschubsicherung: (id) => `<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 220">
+    <rect x="80" y="60" width="20" height="120" rx="2" fill="#94a3b8" stroke="#64748b" stroke-width="0.8"/>
+    <polygon points="100,60 116,52 116,172 100,180" fill="#78828e" stroke="#64748b" stroke-width="0.6"/>
+    <rect x="83" y="76"  width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="83" y="90"  width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="83" y="104" width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="83" y="118" width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="83" y="132" width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="83" y="146" width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="560" y="60" width="20" height="120" rx="2" fill="#94a3b8" stroke="#64748b" stroke-width="0.8"/>
+    <polygon points="580,60 596,52 596,172 580,180" fill="#78828e" stroke="#64748b" stroke-width="0.6"/>
+    <rect x="563" y="76"  width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="563" y="90"  width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="563" y="104" width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="563" y="118" width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="563" y="132" width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="563" y="146" width="10" height="4" rx="1" fill="#64748b"/>
+    <rect x="96" y="112" width="14" height="16" rx="1" fill="#6b7280" stroke="#475569" stroke-width="0.8"/>
+    <polygon points="110,112 122,106 122,122 110,128" fill="#475569"/>
+    <polygon points="96,112 110,112 122,106 108,106" fill="#94a3b8"/>
+    <rect x="550" y="112" width="14" height="16" rx="1" fill="#6b7280" stroke="#475569" stroke-width="0.8"/>
+    <polygon points="564,112 576,106 576,122 564,128" fill="#475569"/>
+    <polygon points="550,112 564,112 576,106 562,106" fill="#94a3b8"/>
+    <polygon points="110,112 550,112 572,106 132,106" fill="#94a3b8" stroke="#64748b" stroke-width="1"/>
+    <polygon points="110,112 110,126 550,126 550,112" fill="#78828e" stroke="#64748b" stroke-width="1"/>
+    <polygon points="550,112 572,106 572,120 550,126" fill="#6b7280" stroke="#64748b" stroke-width="0.8"/>
+    <circle cx="104" cy="116" r="3" fill="#374151" stroke="#1f2937" stroke-width="0.8"/>
+    <circle cx="104" cy="124" r="3" fill="#374151" stroke="#1f2937" stroke-width="0.8"/>
+    <circle cx="558" cy="116" r="3" fill="#374151" stroke="#1f2937" stroke-width="0.8"/>
+    <circle cx="558" cy="124" r="3" fill="#374151" stroke="#1f2937" stroke-width="0.8"/>
+  </svg>`
+};
+
+// Mapping: Typ → BAUTEIL_SKETCHES key
+const BAUTEIL_SKETCH_MAP = {
+  'Rückwandgitter':      'rueckwandgitter',
+  'Stützenanfahrschutz': 'anfahrschutz',
+  'Eckschutz':           'eckschutz',
+  'Leitplanke':          'leitplanke',
+  'Durchschubsicherung': 'durchschubsicherung',
+  'Einlegeboden':        null,  // uses AT_SKETCHES
+  'Anfahrschutz':        'anfahrschutz',
+};
+
+function getBauteilSketch(typ, id) {
+  const key = BAUTEIL_SKETCH_MAP[typ];
+  if (key && BAUTEIL_SKETCHES[key]) return BAUTEIL_SKETCHES[key](id||typ.replace(/[^a-z]/gi,''));
+  return null;
+}
+
+
 function atSketchSVG(typ, activeSketch){
   const id = typ.replace(/[^a-z]/gi,'');
+  // Check if this type has a dedicated bauteil sketch
+  const bauteilSvg = getBauteilSketch(typ, id);
+  if(bauteilSvg){
+    return `<div style="display:flex;flex-direction:column">
+      <div id="at-sketch-${id}">${bauteilSvg}</div>
+    </div>`;
+  }
+  // Fallback: Einlegeboden with material switch buttons
   const sketches=[
     {key:'stahlblech', label:'Stahlblech'},
     {key:'gitterrost', label:'Gitterrost'},
     {key:'holz',       label:'Holz'}
   ];
-  const active = activeSketch || (typ==='Einlegeboden'?'stahlblech': typ==='Rückwandgitter'||typ==='Durchschubsicherung'?'gitterrost':'holz');
+  const active = activeSketch || 'stahlblech';
   const btnStyle = `border:1px solid var(--border);border-radius:6px;background:transparent;font-size:11px;padding:7px 10px;cursor:pointer;font-family:Inter,sans-serif;color:var(--sub);transition:all .15s`;
   const btnActiveStyle = `border:1px solid var(--accent);border-radius:6px;background:rgba(0,0,205,0.06);font-size:11px;padding:7px 10px;cursor:pointer;font-family:Inter,sans-serif;color:var(--accent);font-weight:600`;
   const btns = sketches.map(s=>`<button style="${s.key===active?btnActiveStyle:btnStyle}" onclick="switchATSketch('${typ}','${s.key}')">${s.label}</button>`).join('');
@@ -1036,6 +1235,110 @@ function switchATSketch(typ, sketchKey){
   });
 }
 
+function atSwitchBtns(itemId, typ){
+  const bk = BAUTEIL_SKETCH_MAP[typ];
+  if(bk && BAUTEIL_SKETCHES[bk]){
+    // Dedicated sketch – no switch buttons needed
+    return '';
+  }
+  // Einlegeboden: show material switch buttons
+  const item = atItems.find(x=>x.id===itemId)||{};
+  const active = item._sketch||'stahlblech';
+  const sketches=[{key:'stahlblech',label:'Stahlblech'},{key:'gitterrost',label:'Gitterrost'},{key:'holz',label:'Holz'}];
+  const bStyle='border:1px solid var(--border);border-radius:6px;background:transparent;font-size:11px;padding:7px 10px;cursor:pointer;font-family:Inter,sans-serif;color:var(--sub);transition:all .15s';
+  const aStyle='border:1px solid var(--accent);border-radius:6px;background:rgba(0,0,205,0.06);font-size:11px;padding:7px 10px;cursor:pointer;font-family:Inter,sans-serif;color:var(--accent);font-weight:600';
+  return sketches.map(s=>`<button data-sketch="${s.key}" style="${s.key===active?aStyle:bStyle}" onclick="switchATSketch('${itemId}','${s.key}')">${s.label}</button>`).join('');
+}
+
+function atFieldInput(el){
+  const id = el.dataset.id;
+  const field = el.dataset.field;
+  const item = atItems.find(x=>x.id===id);
+  if(!item) return;
+  item[field] = el.value;
+  if(field==='laenge'||field==='breite') updateATSketch(id);
+}
+
+function atItemFields(item){
+  const id = item.id;
+  const inp = (field,label,placeholder,type)=>{
+    type=type||'text';
+    return `<div class="field" style="margin-bottom:0"><label>${label}</label>
+      <input type="${type}" value="${item[field]||''}" placeholder="${placeholder}"
+        data-id="${id}" data-field="${field}"
+        oninput="atFieldInput(this)">
+    </div>`;
+  };
+  const stk = ()=>`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;height:100%">
+      <div style="font-size:11px;color:var(--sub);font-weight:700;letter-spacing:.06em">STÜCKZAHL</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button onclick="atQtyChange('${id}',-1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">−</button>
+        <input id="at-qty-${id}" type="number" min="1" value="${item.anzahl||1}"
+          oninput="const v=parseInt(this.value)||1;atItems.find(x=>x.id==='${id}').anzahl=v;this.value=v"
+          style="width:56px;height:34px;border:1.5px solid var(--accent);border-radius:8px;background:var(--bg2);color:var(--accent);font-size:20px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield">
+        <button onclick="atQtyChange('${id}',+1)" style="width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">+</button>
+      </div>
+    </div>`;
+
+  switch(item.typ){
+    case 'Einlegeboden':
+      return `<div class="field-grid" style="margin-bottom:0">
+        ${inp('anzahl','Anzahl Felder','z.B. 4','number')}
+        ${inp('traglast','Rahmenbreite (mm)','z.B. 100')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        ${inp('laenge','Feldweite (mm)','z.B. 2700','number')}
+        ${inp('breite','Stützenbreite (mm)','z.B. 1100','number')}
+      </div>`;
+
+    case 'Rückwandgitter':
+      return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${inp('laenge','Feldweite (mm)','z.B. 2700','number')}
+        ${inp('traglast','Rahmenbreite (mm)','z.B. 100')}
+      </div>`;
+
+    case 'Durchschubsicherung':
+      return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${inp('laenge','Feldweite (mm)','z.B. 2700','number')}
+        ${inp('breite','Platzhalter','–')}
+      </div>
+      <div style="margin-top:10px">${inp('traglast','Platzhalter','–')}</div>`;
+
+    case 'Eckschutz':
+    case 'Stützenanfahrschutz':
+    case 'Anfahrschutz':
+      return stk();
+
+    case 'Leitplanke':
+      return `<div style="display:flex;flex-direction:column;gap:10px">
+        ${stk()}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+          ${inp('laenge','Breite (mm)','z.B. 2700','number')}
+          ${inp('breite','Stützenrahmen (mm)','z.B. 100')}
+        </div>
+      </div>`;
+
+    default:
+      return `<div class="field-grid" style="margin-bottom:0">
+        ${inp('anzahl','Anzahl Felder','z.B. 4','number')}
+        ${inp('traglast','Rahmenbreite (mm)','z.B. 100')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        ${inp('laenge','Feldweite (mm)','z.B. 2700','number')}
+        ${inp('breite','Stützenbreite (mm)','z.B. 1100','number')}
+      </div>`;
+  }
+}
+
+function atQtyChange(id, delta){
+  const item = atItems.find(x=>x.id===id);
+  if(!item) return;
+  item.anzahl = Math.max(1, parseInt(item.anzahl||1) + delta);
+  const el = document.getElementById('at-qty-'+id);
+  if(el) el.value = item.anzahl;
+}
+
 function renderATItems(){
   const list=document.getElementById('at-items-list');
   const empty=document.getElementById('at-items-empty');
@@ -1043,43 +1346,29 @@ function renderATItems(){
   if(!atItems.length){list.innerHTML='';if(empty)empty.style.display='block';return;}
   if(empty)empty.style.display='none';
   list.innerHTML=atItems.map(item=>`
-    <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:8px">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;position:relative">
+      <!-- Blauer Akzentbalken links -->
+      <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:12px 0 0 12px"></div>
+      <div style="padding:14px 14px 14px 18px">
+        <!-- Header: Titel + Buttons -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
           <div style="font-size:13px;font-weight:700;color:var(--accent)">${item.typ}</div>
+          <div id="at-btns-${item.id}" style="display:flex;gap:6px;flex-wrap:wrap;margin-left:6px">${atSwitchBtns(item.id, item.typ)}</div>
           <button onclick="duplicateATItem('${item.id}')" style="border:none;background:transparent;color:var(--sub);font-size:13px;cursor:pointer;padding:0;margin-left:auto" title="Duplizieren">⧉</button>
           <button onclick="removeATItem('${item.id}')" style="border:none;background:transparent;color:var(--red);font-size:18px;cursor:pointer;padding:0" title="Entfernen">×</button>
         </div>
-        <div id="at-btns-${item.id}" style="display:flex;gap:6px;flex-wrap:wrap">${atSwitchBtns(item.id, item.typ)}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end">
-        <div>
-          <div class="field-grid" style="margin-bottom:0">
-            <div class="field"><label>Anzahl Felder</label>
-              <input type="number" value="${item.anzahl}" placeholder="z.B. 4" min="1"
-                oninput="atItems.find(x=>x.id==='${item.id}').anzahl=this.value">
-            </div>
-            <div class="field"><label>Traglast (kg/m²)</label>
-              <input type="text" value="${item.traglast}" placeholder="z.B. 750"
-                oninput="atItems.find(x=>x.id==='${item.id}').traglast=this.value">
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;align-items:end">
-            <div class="field" style="margin-bottom:0"><label>Feldweite (mm)</label>
-              <input type="number" value="${item.laenge}" placeholder="z.B. 2700"
-                oninput="atItems.find(x=>x.id==='${item.id}').laenge=this.value;updateATSketch('${item.typ}')">
-            </div>
-            <div class="field" style="margin-bottom:0"><label>Traversen Innenmass (mm)</label>
-              <input type="number" value="${item.breite}" placeholder="z.B. 1100"
-                oninput="atItems.find(x=>x.id==='${item.id}').breite=this.value;updateATSketch('${item.typ}')">
-            </div>
-          </div>
-          <div class="field" style="margin-top:10px;margin-bottom:0"><label>Bemerkung</label>
-            <input type="text" value="${item.bemerkung}" placeholder="Freitext..."
-              oninput="atItems.find(x=>x.id==='${item.id}').bemerkung=this.value">
-          </div>
+        <!-- Felder + Skizze -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center" class="at-item-grid">
+          <div>${atItemFields(item)}</div>
+          <div id="at-sketch-${item.id}" style="opacity:0.95">${(()=>{const bk=BAUTEIL_SKETCH_MAP[item.typ];return bk&&BAUTEIL_SKETCHES[bk]?BAUTEIL_SKETCHES[bk](item.id):AT_SKETCHES[item._sketch||'stahlblech'](item.id,'','');})()} </div>
         </div>
-        <div id="at-sketch-${item.id}" style="opacity:0.9">${AT_SKETCHES[item._sketch||(item.typ==='Einlegeboden'?'stahlblech':item.typ==='Rückwandgitter'||item.typ==='Durchschubsicherung'?'gitterrost':'holz')](item.id,'','')}</div>
+        <!-- Bemerkung -->
+        <div style="margin-top:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.06em;margin-bottom:4px">BEMERKUNG</div>
+          <input type="text" value="${item.bemerkung||''}" placeholder="Freitext..."
+            oninput="atItems.find(x=>x.id==='${item.id}').bemerkung=this.value"
+            style="width:100%;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box">
+        </div>
       </div>
     </div>`).join('');
 }
@@ -2037,7 +2326,8 @@ async function exportCombinedSammelPDF(){
   }
   async function addSketch(sketchKey,cardY,cardH){
     try{
-      const svgStr=AT_SKETCHES[sketchKey]('pdf','','');
+      const svgStr=(BAUTEIL_SKETCHES[sketchKey]?BAUTEIL_SKETCHES[sketchKey]('pdf'):AT_SKETCHES[sketchKey]?AT_SKETCHES[sketchKey]('pdf','',''):'');
+      if(!svgStr)return;
       const blob=new Blob([svgStr],{type:'image/svg+xml'});
       const url=URL.createObjectURL(blob);
       await new Promise(res=>{
@@ -2127,7 +2417,7 @@ async function exportCombinedSammelPDF(){
     metaRow([{l:'Kunde',v:e.kunde},{l:'Reihe',v:e.reihe},{l:'Datum',v:e.datum},{l:'Erfasser',v:e.erfasser}]);
     sh('Positionen');
     for(const item of (e.items||[])){
-      const sketchKey=item._sketch||(item.typ==='Einlegeboden'?'stahlblech':item.typ==='Rückwandgitter'||item.typ==='Durchschubsicherung'?'gitterrost':'holz');
+      const sketchKey=item._sketch||(BAUTEIL_SKETCH_MAP[item.typ]||( item.typ==='Einlegeboden'?'stahlblech':'gitterrost'));
       const {cardY,cardH}=card(item.typ,[
         {l:'Anzahl Felder',v:item.anzahl},
         {l:'Feldweite',v:item.laenge?item.laenge+' mm':''},
@@ -2849,7 +3139,8 @@ function makePDFDoc(){
   };
   const addSVGSketch=async(sketchKey,cardY,cardH)=>{
     try{
-      const svgStr=AT_SKETCHES[sketchKey]('pdf','','');
+      const svgStr=(BAUTEIL_SKETCHES[sketchKey]?BAUTEIL_SKETCHES[sketchKey]('pdf'):AT_SKETCHES[sketchKey]?AT_SKETCHES[sketchKey]('pdf','',''):'');
+      if(!svgStr)return;
       const blob=new Blob([svgStr],{type:'image/svg+xml'});
       const url=URL.createObjectURL(blob);
       await new Promise(res=>{
