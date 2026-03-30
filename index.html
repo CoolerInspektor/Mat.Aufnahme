@@ -225,6 +225,11 @@ canvas{width:100%;display:block}
       <div style="font-size:14px;font-weight:700;color:var(--text)">Sammel-PDF</div>
       <div style="font-size:12px;color:var(--sub);margin-top:4px">Alle Aufnahmen zusammenführen</div>
     </div>
+    <div onclick="showScreen('grundriss')" style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:20px 16px;cursor:pointer;text-align:center;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:32px;margin-bottom:10px">📐</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">Grundrissplaner</div>
+      <div style="font-size:12px;color:var(--sub);margin-top:4px">Regale im Raum platzieren</div>
+    </div>
   </div>
 </div>
 
@@ -447,45 +452,19 @@ canvas{width:100%;display:block}
     </div>
   </div>
     </div>
-    <!-- Row 1, Col 2: Optionen -->
-    <div class="fg-r1c2">
-  <!-- OPTIONEN -->
-  <div class="section-block" style="height:100%;box-sizing:border-box">
-    <div class="section-label">4 · Optionen</div>
-    <div class="field-grid">
-      <div class="field field-full">
-        <label>Eckschützer – Position wählen (Mehrfachauswahl)</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-          <button id="eck-vl" onclick="toggleEck('vl')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Vorne Links</button>
-          <button id="eck-vr" onclick="toggleEck('vr')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Vorne Rechts</button>
-          <button id="eck-hl" onclick="toggleEck('hl')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Hinten Links</button>
-          <button id="eck-hr" onclick="toggleEck('hr')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Hinten Rechts</button>
-        </div>
-      </div>
-    </div>
-  </div>
-    </div>
     <!-- Row 2, Col 1: Traversen + Felder -->
     <div class="fg-r2c1">
   <!-- TRAVERSEN -->
   <div class="section-block">
-    <div class="section-label">2 · Traversen (Holme)</div>
+    <div class="section-label">2 · Felder / Ebenen</div>
     <div class="field-grid">
-      <div class="field"><label>Anzahl Felder</label><input type="number" id="f-felder" placeholder="z.B. 3" min="1" max="20" oninput="onFelderChange()"></div>
-      <div class="field"><label>Anzahl Ebenen</label><input type="number" id="f-ebenen" placeholder="z.B. 4" min="1" max="12" oninput="updateSketch();calcGesamtsystem()"></div>
-      <div class="field"><label>Traversenlänge / Feldweite (mm)</label><input type="number" id="f-breite" placeholder="z.B. 2700" oninput="onBreiteChange()"></div>
-      <div class="field"><label>Profilhöhe / Holmhöhe (mm)</label><input type="number" id="p-traverse-hoehe" placeholder="z.B. 100" oninput="calcGesamtsystem()"></div>
-      <div class="field"><label>Profilbreite Traverse (mm)</label><input type="number" id="p-traverse-breite" placeholder="z.B. 50"></div>
-      <div class="field field-full"><label>Bemerkungen Traverse</label><textarea id="p-traverse-dicke" rows="2" placeholder="z.B. Schäden, Auffälligkeiten..."></textarea></div>
-    </div>
-  </div>
-    </div>
-    <!-- Row 2, Col 2: Regalfach -->
-    <div class="fg-r2c2">
-  <!-- REGALFACH -->
-  <div class="section-block" id="regelm-block">
-    <div class="section-label">3 · Regalfach (Ebene)</div>
-    <div class="field-grid">
+      <div class="field field-full">
+        <label>Grundfeld oder Anbaufeld?</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" id="tog-anbau-nein" onclick="setToggle('anbau','nein');updateSketch()">Nein – Grundfeld</button>
+          <button class="toggle-btn" id="tog-anbau-ja" onclick="setToggle('anbau','ja');updateSketch()">Ja – Anbaufeld</button>
+        </div>
+      </div>
       <div class="field field-full">
         <label>Sind alle Felder gleich?</label>
         <div class="regelm-toggle">
@@ -493,25 +472,12 @@ canvas{width:100%;display:block}
           <button class="regelm-btn" id="regelm-nein" onclick="setRegelm(false)">≠ Nein – unterschiedlich</button>
         </div>
       </div>
-      <div class="field field-full">
-        <label>Anbaufeld (linke Stütze geteilt)?</label>
-        <div class="toggle-group">
-          <button class="toggle-btn" id="tog-anbau-ja" onclick="setToggle('anbau','ja');updateSketch()">Ja – Anbaufeld</button>
-          <button class="toggle-btn" id="tog-anbau-nein" onclick="setToggle('anbau','nein');updateSketch()">Nein – Grundfeld</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- GESAMTSYSTEM -->
-  <div class="section-block">
-    <div class="section-label">5 · Gesamtsystem</div>
-    <div class="field-grid">
-      <div class="field"><label>Gangbreite (mm)</label><input type="number" id="f-gangbreite" placeholder="z.B. 3500"></div>
-    </div>
-    <div id="gs-results" style="margin-top:12px"></div>
-    <div id="gs-warnings" style="margin-top:8px"></div>
-  </div>
+      <div class="field"><label>Anzahl Felder</label><input type="number" id="f-felder" placeholder="z.B. 3" min="1" max="20" oninput="onFelderChange()"></div>
+      <div class="field"><label>Anzahl Ebenen</label><input type="number" id="f-ebenen" placeholder="z.B. 4" min="1" max="12" oninput="updateSketch();calcGesamtsystem()"></div>
+      <div class="field"><label>Traversenlänge / Feldweite (mm)</label><input type="number" id="f-breite" placeholder="z.B. 2700" oninput="onBreiteChange()"></div>
+      <div class="field"><label>Profilhöhe / Holmhöhe (mm)</label><input type="number" id="p-traverse-hoehe" placeholder="z.B. 100" oninput="calcGesamtsystem()"></div>
+      <div class="field"><label>Profilbreite Traverse (mm)</label><input type="number" id="p-traverse-breite" placeholder="z.B. 50"></div>
+      <div class="field field-full"><label>Bemerkungen Traverse</label><textarea id="p-traverse-dicke" rows="2" placeholder="z.B. Schäden, Auffälligkeiten..."></textarea></div>
     </div>
   </div>
 
@@ -528,6 +494,45 @@ canvas{width:100%;display:block}
   <div class="section-block" id="per-feld-block">
     <div class="section-label" id="per-feld-label">Felder</div>
     <div class="field-cards" id="field-cards"></div>
+  </div>
+    </div>
+    <!-- Row 2, Col 2: Regalfach -->
+    <div class="fg-r2c2">
+  <!-- REGALFACH -->
+  <div class="section-block" id="regelm-block">
+    <div class="section-label">3 · Regalfach (Ebene)</div>
+    <div class="field-grid">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GESAMTSYSTEM -->
+  <div class="section-block">
+    <div class="section-label">5 · Gesamtsystem</div>
+    <div class="field-grid">
+      <div class="field"><label>Gangbreite (mm)</label><input type="number" id="f-gangbreite" placeholder="z.B. 3500"></div>
+    </div>
+    <div id="gs-results" style="margin-top:12px"></div>
+    <div id="gs-warnings" style="margin-top:8px"></div>
+  </div>
+  <div class="section-block" style="height:100%;box-sizing:border-box">
+    <div class="section-label">6 · Optionen</div>
+    <div class="field-grid">
+      <div class="field field-full">
+        <label>Eckschützer – Position wählen (Mehrfachauswahl)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+          <button id="eck-vl" onclick="toggleEck('vl')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Vorne Links</button>
+          <button id="eck-vr" onclick="toggleEck('vr')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Vorne Rechts</button>
+          <button id="eck-hl" onclick="toggleEck('hl')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Hinten Links</button>
+          <button id="eck-hr" onclick="toggleEck('hr')" style="padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--sub);font-family:Inter,sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s">Hinten Rechts</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    </div>
   </div>
 
   <!-- PROFILE STREBEN -->
@@ -1251,7 +1256,7 @@ const BAUTEIL_SKETCHES = {
     <line x1="573" y1="42.5" x2="573" y2="237" stroke="#a0afbb" stroke-width="0.8"/>
   </svg>`,
 
-  anfahrschutz: (id) => `<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 280">
+  anfahrschutz: (id) => `<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 300">
     <defs>
       <pattern id="pF${id}" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
         <rect width="11" height="22" fill="#fbbf24"/><rect x="11" width="11" height="22" fill="#1f2937"/>
@@ -1259,31 +1264,37 @@ const BAUTEIL_SKETCHES = {
       <pattern id="pS${id}" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
         <rect width="11" height="22" fill="#d4960a"/><rect x="11" width="11" height="22" fill="#181e2a"/>
       </pattern>
-      <clipPath id="cpF${id}"><rect x="290" y="50" width="100" height="180"/></clipPath>
-      <clipPath id="cpL${id}"><polygon points="290,50 254,30 254,210 290,230"/></clipPath>
-      <clipPath id="cpR${id}"><polygon points="390,50 426,30 426,210 390,230"/></clipPath>
     </defs>
-    <!-- Linker Schenkel geht nach links-hinten (ISO: -36px, -20px) -->
-    <polygon points="290,50 254,30 254,210 290,230" fill="url(#pS${id})" clip-path="url(#cpL${id})"/>
-    <polygon points="290,50 254,30 254,35 290,55" fill="url(#pS${id})"/>
-    <polygon points="290,50 254,30 254,35 290,55" fill="none" stroke="#374151" stroke-width="0.8"/>
-    <line x1="290" y1="230" x2="254" y2="210" stroke="#374151" stroke-width="1.5"/>
-    <line x1="254" y1="30" x2="254" y2="210" stroke="#374151" stroke-width="1.5"/>
-    <polygon points="290,50 254,30 254,210 290,230" fill="none" stroke="#374151" stroke-width="1.5"/>
-    <!-- Rechter Schenkel geht nach rechts-hinten (ISO: +36px, -20px) -->
-    <polygon points="390,50 426,30 426,210 390,230" fill="url(#pS${id})" clip-path="url(#cpR${id})"/>
-    <polygon points="390,50 426,30 426,35 390,55" fill="url(#pS${id})"/>
-    <polygon points="390,50 426,30 426,35 390,55" fill="none" stroke="#374151" stroke-width="0.8"/>
-    <line x1="390" y1="230" x2="426" y2="210" stroke="#374151" stroke-width="1.5"/>
-    <line x1="426" y1="30" x2="426" y2="210" stroke="#374151" stroke-width="1.5"/>
-    <polygon points="390,50 426,30 426,210 390,230" fill="none" stroke="#374151" stroke-width="1.5"/>
-    <!-- Oberkante ISO (verbindet alle drei Flächen) -->
-    <polygon points="254,30 290,50 390,50 426,30" fill="url(#pF${id})"/>
-    <polygon points="254,30 290,50 390,50 426,30" fill="none" stroke="#374151" stroke-width="1"/>
-    <!-- Frontfläche -->
-    <rect x="290" y="50" width="100" height="180" fill="url(#pF${id})" clip-path="url(#cpF${id})"/>
-    <line x1="290" y1="230" x2="390" y2="230" stroke="#374151" stroke-width="1.5"/>
-    <rect x="290" y="50" width="100" height="180" fill="none" stroke="#374151" stroke-width="1.5"/>
+
+    <!-- ══ ANFAHRSCHUTZ U-PROFIL (gelb-schwarz) ══ -->
+    <!-- Linker Schenkel Seite (ISO) -->
+    <polygon points="310,58 274,38 274,242 310,262" fill="url(#pS${id})" stroke="#374151" stroke-width="1.5"/>
+    <!-- Linker Schenkel Innendicke oben -->
+    <polygon points="310,58 274,38 282,42 318,62" fill="#e5a800" stroke="#374151" stroke-width="0.8"/>
+
+    <!-- Rechter Schenkel Seite (ISO) -->
+    <polygon points="370,58 406,38 406,242 370,262" fill="url(#pS${id})" stroke="#374151" stroke-width="1.5"/>
+    <!-- Rechter Schenkel Innendicke oben -->
+    <polygon points="370,58 406,38 398,42 362,62" fill="#e5a800" stroke="#374151" stroke-width="0.8"/>
+
+    <!-- Boden ISO Seite -->
+    <polygon points="310,262 274,242 406,242 370,262" fill="#c88a00" stroke="#374151" stroke-width="1"/>
+    <!-- Boden Front -->
+    <rect x="310" y="244" width="60" height="18" fill="url(#pF${id})" stroke="#374151" stroke-width="1.5"/>
+
+    <!-- Front – geschlossene Vorderwand -->
+    <rect x="310" y="58" width="60" height="186" fill="url(#pF${id})" stroke="#374151" stroke-width="1.5"/>
+    <!-- Innendicke linker Schenkel vorne -->
+    <rect x="310" y="58" width="12" height="186" fill="#e5a800" stroke="#374151" stroke-width="0.8"/>
+    <!-- Innendicke rechter Schenkel vorne -->
+    <rect x="358" y="58" width="12" height="186" fill="#e5a800" stroke="#374151" stroke-width="0.8"/>
+
+    <!-- Offene Seite oben – gestrichelt -->
+    <line x1="310" y1="58" x2="370" y2="58" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5,3"/>
+    <line x1="274" y1="38" x2="406" y2="38" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5,3"/>
+
+    <!-- Label -->
+    <text font-size="11" font-family="Arial,sans-serif" fill="#475569" x="340" y="288" text-anchor="middle">Stützenanfahrschutz</text>
   </svg>`,
 
   eckschutz: (id) => `<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 280">
@@ -1638,28 +1649,31 @@ const ET_SKETCHES={
   </svg>`,
 
   Stützenrahmen:(id)=>`<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 400 300">
+    <!-- Linker Ständer -->
     <rect x="70" y="38" width="10" height="222" fill="#2563eb" stroke="#1d4ed8" stroke-width="1"/>
     <polygon points="80,38 100,30 100,252 80,260" fill="#1a52d4" stroke="#1d4ed8" stroke-width="0.7"/>
     <polygon points="70,38 80,38 100,30 90,30" fill="#60a5fa" stroke="#1d4ed8" stroke-width="0.5"/>
+    <!-- Rechter Ständer -->
     <rect x="290" y="38" width="10" height="222" fill="#2563eb" stroke="#1d4ed8" stroke-width="1"/>
     <polygon points="300,38 320,30 320,252 300,260" fill="#1a52d4" stroke="#1d4ed8" stroke-width="0.7"/>
     <polygon points="290,38 300,38 320,30 310,30" fill="#60a5fa" stroke="#1d4ed8" stroke-width="0.5"/>
-    <rect x="80" y="250" width="210" height="7" rx="1" fill="#64748b" stroke="#475569" stroke-width="0.8"/>
-    <polygon points="290,250 300,250 300,257 290,257" fill="#475569"/>
+    <!-- Querverstrebung oben -->
     <rect x="80" y="40" width="210" height="7" rx="1" fill="#64748b" stroke="#475569" stroke-width="0.8"/>
     <polygon points="290,40 300,40 300,47 290,47" fill="#475569"/>
+    <!-- Querverstrebung unten -->
+    <rect x="80" y="250" width="210" height="7" rx="1" fill="#64748b" stroke="#475569" stroke-width="0.8"/>
+    <polygon points="290,250 300,250 300,257 290,257" fill="#475569"/>
+    <!-- Zickzack Diagonalstreben -->
     <line x1="80"  y1="257" x2="290" y2="205" stroke="#78828e" stroke-width="3" stroke-linecap="round"/>
     <line x1="290" y1="205" x2="80"  y2="153" stroke="#78828e" stroke-width="3" stroke-linecap="round"/>
     <line x1="80"  y1="153" x2="290" y2="101" stroke="#78828e" stroke-width="3" stroke-linecap="round"/>
     <line x1="290" y1="101" x2="80"  y2="47"  stroke="#78828e" stroke-width="3" stroke-linecap="round"/>
-    <polygon points="58,256 82,256 100,248 76,248" fill="#374151" stroke="#1f2937" stroke-width="0.7"/>
-    <polygon points="58,256 58,263 82,263 82,256" fill="#374151"/>
-    <polygon points="278,256 302,256 320,248 296,248" fill="#374151" stroke="#1f2937" stroke-width="0.7"/>
-    <polygon points="278,256 278,263 302,263 302,256" fill="#374151"/>
+    <!-- Bemaßung Breite -->
     <line x1="70" y1="278" x2="300" y2="278" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3 2"/>
     <line x1="70" y1="274" x2="70" y2="282" stroke="#94a3b8" stroke-width="0.8"/>
     <line x1="300" y1="274" x2="300" y2="282" stroke="#94a3b8" stroke-width="0.8"/>
     <text font-size="10" font-family="Arial,sans-serif" fill="#64748b" x="185" y="294" text-anchor="middle">Breite</text>
+    <!-- Bemaßung Höhe -->
     <line x1="46" y1="38" x2="46" y2="260" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3 2"/>
     <line x1="41" y1="38" x2="51" y2="38" stroke="#94a3b8" stroke-width="0.8"/>
     <line x1="41" y1="260" x2="51" y2="260" stroke="#94a3b8" stroke-width="0.8"/>
@@ -2764,7 +2778,14 @@ async function exportCombinedSammelPDF(){
         const img=new Image();
         img.onload=()=>{
           const cv=document.createElement('canvas');cv.width=420;cv.height=220;
-          const ctx2=cv.getContext('2d');ctx2.fillStyle='#f8fafc';ctx2.fillRect(0,0,420,220);ctx2.drawImage(img,0,0);
+          const ctx2=cv.getContext('2d');ctx2.fillStyle='#f8fafc';ctx2.fillRect(0,0,420,220);
+          // Scale to fit while maintaining aspect ratio, centered
+          const iAR=img.naturalWidth/img.naturalHeight;
+          const cAR=420/220;
+          let dw,dh,dx,dy;
+          if(iAR>cAR){dw=420;dh=420/iAR;dx=0;dy=(220-dh)/2;}
+          else{dh=220;dw=220*iAR;dx=(420-dw)/2;dy=0;}
+          ctx2.drawImage(img,dx,dy,dw,dh);
           try{doc.addImage(cv.toDataURL('image/png'),'PNG',ml+cw/2+2,cardY+2,cw/2-4,cardH-4);}catch(_){}
           URL.revokeObjectURL(url);res();
         };
@@ -2805,20 +2826,49 @@ async function exportCombinedSammelPDF(){
     const cv2=document.createElement('canvas');
     cv2.width=skW*skDpr;cv2.height=skH*skDpr;
     const cx2=cv2.getContext('2d');cx2.scale(skDpr,skDpr);
-    cx2.fillStyle='#f4f6fb';cx2.fillRect(0,0,skW,skH);
+    const _eMode=e.sketchViewMode||sketchViewMode||'iso';
+    const _eEb=parseInt(e.ebenen)||4;
+    const _skH2=_eMode==='2d'?Math.max(200,60+_eEb*52+30):skH;
+    cv2.height=_skH2*skDpr;cv2.style&&(cv2.style.height=_skH2+'px');
+    const cx2b=cv2.getContext('2d');cx2b.scale(skDpr,skDpr);
+    cx2b.fillStyle='#f4f6fb';cx2b.fillRect(0,0,skW,_skH2);
     const fd2={lichtweiten:e.lichtweiten||[],felderEbenen:e.felderEbenen||[],lichthoehen:e.lichthoehen||[],einlagen:e.einlagen||[],rwg:e.rwg||[],rwgVon:e.rwgVon||[],rwgBis:e.rwgBis||[],dsv:e.dsv||[],dsvVon:e.dsvVon||[],dsvBis:e.dsvBis||[]};
     const tmp2={};(e.dsv||[]).forEach((v,i)=>{if(v==='ja')tmp2[i]='ja';});
-    Object.assign(dsvState,tmp2);
+    const _savedDsv2={...dsvState};Object.assign(dsvState,tmp2);
     const savedEck2=new Set(eckSet);(e.eckPositions||[]).forEach(p=>eckSet.add(p));
     const oh2=document.getElementById('f-hoehe')?.value;
     const ob2=document.getElementById('p-stuetze-breite')?.value;
     sv('f-hoehe',e.hoehe||'');sv('p-stuetze-breite',e.profiles?.stuetze?.breite||'');
-    drawRegal(cx2,parseInt(e.felder)||3,parseInt(e.ebenen)||4,fd2,e.anbau==='ja',skW,skH);
+    if(e.abschnitte&&e.abschnitte.length>0){
+      // Draw sections side by side
+      const secs2=e.abschnitte;
+      const SEP2=12,ng2=secs2.length;
+      const totalWt2=secs2.reduce((a,s)=>a+Math.max(parseInt(s.felder)||1,1),0);
+      let gx2=0,fOff2=0;
+      secs2.forEach((sec2,gi2)=>{
+        const sf2=Math.max(parseInt(sec2.felder)||1,1);
+        const gw2=Math.floor((sf2/totalWt2)*(skW-SEP2*(ng2-1)));
+        const eb2=Math.max(parseInt(sec2.ebenen)||_eEb,1);
+        const slice2=(arr)=>(arr||[]).slice(fOff2,fOff2+sf2);
+        const fdSec2={lichtweiten:slice2(fd2.lichtweiten),felderEbenen:slice2(fd2.felderEbenen),lichthoehen:slice2(fd2.lichthoehen),einlagen:slice2(fd2.einlagen),rwg:slice2(fd2.rwg),rwgVon:slice2(fd2.rwgVon),rwgBis:slice2(fd2.rwgBis),dsv:slice2(fd2.dsv),dsvVon:slice2(fd2.dsvVon),dsvBis:slice2(fd2.dsvBis)};
+        cx2b.save();cx2b.translate(gx2,0);cx2b.beginPath();cx2b.rect(0,0,gw2,_skH2);cx2b.clip();
+        const _isA2=(sec2.typ||'grund')==='anbau';
+        if(_eMode==='2d'){drawRegal2D(cx2b,sf2,eb2,fdSec2,gw2,_skH2,_isA2&&gi2===0);}
+        else{drawRegal(cx2b,sf2,eb2,fdSec2,_isA2&&gi2===0,gw2,_skH2,fOff2);}
+        cx2b.restore();
+        fOff2+=sf2;
+        if(gi2<ng2-1){cx2b.setLineDash([3,2]);cx2b.strokeStyle='#94a3b8';cx2b.lineWidth=1;cx2b.beginPath();cx2b.moveTo(gx2+gw2+SEP2/2,8);cx2b.lineTo(gx2+gw2+SEP2/2,_skH2-8);cx2b.stroke();cx2b.setLineDash([]);}
+        gx2+=gw2+SEP2;
+      });
+    } else {
+      if(_eMode==='2d'){drawRegal2D(cx2b,parseInt(e.felder)||3,_eEb,fd2,skW,_skH2,e.anbau==='ja');}
+      else{drawRegal(cx2b,parseInt(e.felder)||3,_eEb,fd2,e.anbau==='ja',skW,_skH2);}
+    }
     sv('f-hoehe',oh2||'');sv('p-stuetze-breite',ob2||'');
-    Object.keys(tmp2).forEach(k=>delete dsvState[k]);
+    Object.assign(dsvState,_savedDsv2);
     eckSet.clear();savedEck2.forEach(p=>eckSet.add(p));
     const skImg=cv2.toDataURL('image/png');
-    const skPh=Math.round(cw*(skH/skW));
+    const skPh=Math.round(cw*(_skH2/skW));
     guard(skPh+2);
     doc.setFillColor(244,246,251);doc.roundedRect(ml,y,cw,skPh,1.5,1.5,'F');
     doc.setDrawColor(...NL);doc.setLineWidth(0.3);doc.roundedRect(ml,y,cw,skPh,1.5,1.5,'S');
@@ -2834,8 +2884,23 @@ async function exportCombinedSammelPDF(){
       {l:'Einlegeböden',v:(e.einlagen||[]).some(a=>(a||[]).some(x=>x&&x!=='—'))?'Ja':'—'},
     ],null,false);
     y+=((2)*14+14+4)+4;
+    // Gesamtsystem in combined PDF
+    {
+      const totalF=(e.abschnitte&&e.abschnitte.length>0)?e.abschnitte.reduce((a,s)=>a+Math.max(parseInt(s.felder)||0,0),0):parseInt(e.felder)||0;
+      let stT=0,tT=0;
+      if(e.abschnitte&&e.abschnitte.length>0){e.abschnitte.forEach((sec,si)=>{const sf=Math.max(parseInt(sec.felder)||0,0);const eb=parseInt(sec.ebenen)||parseInt(e.ebenen)||0;stT+=si===0?sf+((sec.typ||'grund')==='anbau'?0:1):(sf+1);tT+=sf*eb*2;});}
+      else{stT=totalF+(e.anbau==='ja'?0:1);tT=totalF*(parseInt(e.ebenen)||0)*2;}
+      if(stT>0){
+        sh('Gesamtsystem');const gH=22;guard(gH+4);
+        doc.setFillColor(232,240,255);doc.rect(ml,y,cw,gH,'F');doc.setFillColor(37,99,235);doc.rect(ml,y,2,gH,'F');
+        doc.setDrawColor(200,210,220);doc.setLineWidth(0.3);doc.rect(ml,y,cw,gH,'S');
+        const gCols=[{l:'Stützen Total',v:stT+' Stk.',c:[37,99,235]},{l:'Traversen Total',v:tT+' Stk.',c:[234,88,12]},{l:'Felder',v:totalF}];
+        gCols.forEach(({l,v,c},i)=>{const x=ml+5+i*(cw/3);doc.setTextColor(...SB);doc.setFontSize(5);doc.setFont('helvetica','bold');doc.text(l.toUpperCase(),x,y+6);doc.setTextColor(...(c||TX));doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text(String(v),x,y+15);});
+        y+=gH+4;
+      }
+    }
     if(e.bemerkung){sh('Bemerkungen');guard(14);doc.setFillColor(248,250,252);doc.rect(ml,y,cw,14,'F');doc.setFillColor(...N);doc.rect(ml,y,2,14,'F');doc.setDrawColor(200,210,220);doc.setLineWidth(0.3);doc.rect(ml,y,cw,14,'S');doc.setTextColor(...TX);doc.setFontSize(8.5);doc.setFont('helvetica','normal');const bls=doc.splitTextToSize(e.bemerkung,cw-8);doc.text(bls[0]||'',ml+5,y+9);y+=18;}
-    await addPhotos(e.photos);
+    await addPhotos(await loadPhotosFromIDB(e.photos||[]));
   }
 
   // ══════════════════════════════════════
@@ -2857,7 +2922,7 @@ async function exportCombinedSammelPDF(){
       await addSketch(sketchKey,cardY,cardH);
       y+=cardH+4;
     }
-    await addPhotos(e.photos);
+    await addPhotos(await loadPhotosFromIDB(e.photos||[]));
   }
 
   // ══════════════════════════════════════
@@ -2868,16 +2933,18 @@ async function exportCombinedSammelPDF(){
     sh('Positionen');
     for(const e of selErsatz){
       const pCol={'Dringend – sofort':[220,38,38],'Hoch – diese Woche':[180,83,9],'Normal – nächster Service':[0,0,160],'Niedrig – beobachten':[100,110,130]};
+      const etSkKey=e.typ==='Traverse'?'traverse':e.typ==='Stützenrahmen'?'stuetzenrahmen':e.typ==='Einzelstütze'?'einzelstuetze':e.typ==='Diagonalstrebe'?'diagonalstrebe':e.typ==='Horizontalstrebe'?'horizontalstrebe':e.typ==='Kleinteile'?'kleinteile':null;
       const {cardY,cardH}=card(
         (e.typ||'Ersatzteil')+(e.prioritaet?' · '+e.prioritaet:''),
         [{l:'Kunde',v:e.kunde},{l:'Reihe',v:e.reihe},{l:'Datum',v:e.datum},{l:'Anzahl',v:e.anzahl?e.anzahl+' Stk':''},{l:'Hersteller/Typ',v:e.hersteller},{l:'Priorität',v:e.prioritaet}],
-        e.bemerkung, false
+        e.bemerkung, !!etSkKey
       );
       if(e.prioritaet&&pCol[e.prioritaet]){
         doc.setFillColor(...pCol[e.prioritaet]);doc.rect(ml,cardY,2,cardH,'F');
       }
+      if(etSkKey) await addSketch(etSkKey,cardY,cardH);
       y+=cardH+4;
-      await addPhotos(e.photos);
+      await addPhotos(await loadPhotosFromIDB(e.photos||[]));
     }
   }
 
@@ -3151,36 +3218,103 @@ function renderPhotoGrid(){
 
 // ── GESAMTSYSTEM ──────────────────────────────────────────
 function calcGesamtsystem(){
-  const felder=parseInt(gv('f-felder'))||0,ebenen=parseInt(gv('f-ebenen'))||0;
+  const totalFelder=getTotalFelder();
+  const ebenen=parseInt(gv('f-ebenen'))||0;
   const rahmH=parseFloat(gv('f-hoehe'))||0,stBr=parseFloat(gv('p-stuetze-breite'))||0;
   const trvH=parseFloat(gv('p-traverse-hoehe'))||0,gangbr=parseFloat(gv('f-gangbreite'))||0;
-  if(!felder)return;
+  if(!totalFelder)return;
+
+  // Gesamtlänge
   let sumFeldweiten=0;
-  if(!regelmaessig){for(let i=0;i<felder;i++){sumFeldweiten+=parseFloat(document.getElementById('lw-'+i)?.value)||parseFloat(gv('f-breite'))||0;}}
-  else{sumFeldweiten=felder*(parseFloat(gv('f-breite'))||0);}
-  const gesamtL=(felder+1)*stBr+sumFeldweiten;
-  const res=document.getElementById('gs-results'),warn=document.getElementById('gs-warnings');if(!res)return;
+  for(let i=0;i<totalFelder;i++) sumFeldweiten+=parseFloat(document.getElementById('lw-'+i)?.value)||parseFloat(gv('f-breite'))||0;
+  if(sumFeldweiten===0&&!regalAbschnitte.length) sumFeldweiten=totalFelder*(parseFloat(gv('f-breite'))||0);
+  const gesamtL=(totalFelder+1)*stBr+sumFeldweiten;
+
+  // Stützen
+  let stutzenTotal=0;
+  if(regalAbschnitte.length===0){
+    stutzenTotal=totalFelder+(toggleState.anbau==='ja'?0:1);
+  } else {
+    regalAbschnitte.forEach((sec,si)=>{
+      const sf=Math.max(parseInt(sec.felder)||0,0);
+      stutzenTotal+=si===0?sf+((sec.typ||'grund')==='anbau'?0:1):(sf+1);
+    });
+  }
+
+  // Traversen: pro Feld × Ebenen × 2
+  let traversenTotal=0;
+  for(let i=0;i<totalFelder;i++){
+    const _fe=parseInt(document.getElementById('eb-'+i)?.value)||ebenen||0;
+    traversenTotal+=_fe*2;
+  }
+
+  const res=document.getElementById('gs-results'),warn=document.getElementById('gs-warnings');
+  if(!res)return;
   let h2='';
+
   if(gesamtL>0)h2+=`<div class="gs-card"><div class="gs-label">GESAMTLÄNGE</div><div class="gs-value">${gesamtL.toLocaleString('de-CH')} mm</div></div>`;
   if(gangbr>0)h2+=`<div class="gs-card"><div class="gs-label">GANGBREITE</div><div class="gs-value">${gangbr.toLocaleString('de-CH')} mm</div></div>`;
+
+  // ── Pro Abschnitt: Stützen + Traversen zusammen ──
+  if(regalAbschnitte.length>0){
+    regalAbschnitte.forEach((sec,si)=>{
+      const sf=Math.max(parseInt(sec.felder)||0,0);
+      const eb=parseInt(sec.ebenen)||parseInt(gv('f-ebenen'))||0;
+      const isA=(sec.typ||'grund')==='anbau';
+      const secSt=si===0?sf+(isA?0:1):(sf+1);
+      const secTrv=sf*eb*2;
+      const typColor=isA?'#ea580c':'#1e40af';
+      const typLabel=isA?'Anbau':'Grund';
+      h2+=`<div class="gs-card" style="border-left:3px solid ${typColor};padding-left:10px">
+        <div class="gs-label" style="color:${typColor};margin-bottom:4px">ABSCHNITT ${si+1} · ${typLabel}</div>
+        <div style="display:flex;gap:16px">
+          <div><div class="gs-label">STÜTZEN</div><div class="gs-value" style="font-size:16px">${secSt} Stk.</div></div>
+          <div><div class="gs-label">TRAVERSEN</div><div class="gs-value" style="font-size:16px;color:#ea580c">${secTrv} Stk.</div></div>
+        </div>
+      </div>`;
+    });
+  } else {
+    // Kein Abschnitt: Einzelregal
+    const isA=toggleState.anbau==='ja';
+    const typColor=isA?'#ea580c':'#1e40af';
+    const typLabel=isA?'Anbaufeld':'Grundfeld';
+    const eb0=parseInt(document.getElementById('eb-0')?.value)||ebenen||0;
+    const trvSingle=totalFelder*eb0*2;
+    h2+=`<div class="gs-card" style="border-left:3px solid ${typColor};padding-left:10px">
+      <div class="gs-label" style="color:${typColor};margin-bottom:4px">REGALREIHE · ${typLabel}</div>
+      <div style="display:flex;gap:16px">
+        <div><div class="gs-label">STÜTZEN</div><div class="gs-value" style="font-size:16px">${stutzenTotal} Stk.</div></div>
+        <div><div class="gs-label">TRAVERSEN</div><div class="gs-value" style="font-size:16px;color:#ea580c">${traversenTotal} Stk.</div></div>
+      </div>
+    </div>`;
+  }
+
+  // ── Totale ──
+  h2+=`<div class="gs-card" style="border:1.5px solid var(--accent)">
+    <div class="gs-label" style="margin-bottom:4px">TOTAL</div>
+    <div style="display:flex;gap:16px">
+      <div><div class="gs-label">STÜTZEN</div><div class="gs-value" style="font-size:18px;font-weight:800;color:var(--accent)">${stutzenTotal} Stk.</div></div>
+      <div><div class="gs-label">TRAVERSEN</div><div class="gs-value" style="font-size:18px;font-weight:800;color:#ea580c">${traversenTotal} Stk.</div></div>
+    </div>
+  </div>`;
+
   let warnHtml='';
   if(rahmH>0&&trvH>0){
-    for(let f=0;f<felder;f++){
+    for(let f=0;f<totalFelder;f++){
       const fe=parseInt(document.getElementById('eb-'+f)?.value)||ebenen;
-      let sumFH=0;let hasFH=false;
+      let sumFH=0,hasFH=false;
       for(let j=0;j<fe;j++){const v=parseFloat(document.getElementById('lh-'+f+'-'+j)?.value)||0;sumFH+=v;if(v>0)hasFH=true;}
       if(!hasFH)continue;
       const hBis=sumFH+fe*trvH,ueberstand=rahmH-hBis;
-      const lbl=felder>1?'Feld '+(f+1):'';
-      h2+=`<div class="gs-card" style="${ueberstand<500?'background:'.concat(ueberstand<0?'#fef2f2':'#fef9c3'):''};border-color:${ueberstand<0?'#fca5a5':ueberstand<500?'#f59e0b':'var(--border)'}"><div class="gs-label">ÜBERSTAND${lbl?' '+lbl:''}</div><div class="gs-value" style="color:${ueberstand<0?'#dc2626':ueberstand<500?'#b45309':'var(--text)'}">${Math.round(ueberstand)} mm</div></div>`;
-      if(ueberstand<0)warnHtml+=`<div class="warn-box danger"><span style="font-size:20px">🚨</span><div><div style="font-weight:700;color:#dc2626;font-size:13px">${lbl?lbl+': ':''}Rahmenhöhe überschritten!</div><div style="font-size:12px;color:#991b1b;margin-top:3px">Belegter Bereich ${Math.round(hBis)} mm > Rahmen ${rahmH} mm</div></div></div>`;
-      else if(ueberstand<500)warnHtml+=`<div class="warn-box caution"><span style="font-size:20px">⚠️</span><div><div style="font-weight:700;color:#b45309;font-size:13px">${lbl?lbl+': ':''}Achtung. Seitliche Herabfallsicherung nicht erfüllt.</div><div style="font-size:12px;color:#92400e;margin-top:3px">Überstand ${Math.round(ueberstand)} mm — mind. 500 mm benötigt</div></div></div>`;
+      const lbl=totalFelder>1?'Feld '+(f+1):'';
+      h2+=`<div class="gs-card" style="${ueberstand<500?'background:'.concat(ueberstand<0?'#fef2f2':'#fef9c3'):''};border-color:${ueberstand<0?'#fca5a5':ueberstand<500?'#f59e0b':'var(--border)'}"><div class="gs-label">ÜBERSTAND${lbl?' '+lbl:''}</div><div class="gs-value" style="color:${ueberstand<0?'#dc2626':ueberstand<500?'#b45309':'var(--text)'}">` + Math.round(ueberstand) + ` mm</div></div>`;
+      if(ueberstand<0)warnHtml+=`<div class="warn-box danger"><span style="font-size:20px">🚨</span><div><div style="font-weight:700;color:#dc2626;font-size:13px">${lbl?lbl+': ':''}Rahmenhöhe überschritten!</div><div style="font-size:12px;color:#991b1b;margin-top:3px">Belegter Bereich `+Math.round(hBis)+` mm > Rahmen ${rahmH} mm</div></div></div>`;
+      else if(ueberstand<500)warnHtml+=`<div class="warn-box caution"><span style="font-size:20px">⚠️</span><div><div style="font-weight:700;color:#b45309;font-size:13px">${lbl?lbl+': ':''}Achtung. Seitliche Herabfallsicherung nicht erfüllt.</div><div style="font-size:12px;color:#92400e;margin-top:3px">Überstand `+Math.round(ueberstand)+` mm — mind. 500 mm benötigt</div></div></div>`;
     }
   }
   res.innerHTML=h2;warn.innerHTML=warnHtml;
   const glEl=document.getElementById('f-gesamtlaenge');if(glEl&&gesamtL>0)glEl.value=Math.round(gesamtL);
 }
-
 // ── SKETCH ────────────────────────────────────────────────
 // ── VIEW ENTRY ────────────────────────────────────────────
 // ── EXPORT CSV ────────────────────────────────────────────
@@ -3256,7 +3390,14 @@ function makePDFDoc(){
         const img=new Image();
         img.onload=()=>{
           const cv=document.createElement('canvas');cv.width=420;cv.height=220;
-          const ctx2=cv.getContext('2d');ctx2.fillStyle='#f8fafc';ctx2.fillRect(0,0,420,220);ctx2.drawImage(img,0,0);
+          const ctx2=cv.getContext('2d');ctx2.fillStyle='#f8fafc';ctx2.fillRect(0,0,420,220);
+          // Scale to fit while maintaining aspect ratio, centered
+          const iAR=img.naturalWidth/img.naturalHeight;
+          const cAR=420/220;
+          let dw,dh,dx,dy;
+          if(iAR>cAR){dw=420;dh=420/iAR;dx=0;dy=(220-dh)/2;}
+          else{dh=220;dw=220*iAR;dx=(420-dw)/2;dy=0;}
+          ctx2.drawImage(img,dx,dy,dw,dh);
           try{doc.addImage(cv.toDataURL('image/png'),'PNG',ml+cw/2+2,cardY+2,cw/2-4,cardH-4);}catch(_){}
           URL.revokeObjectURL(url);res();
         };
@@ -3286,9 +3427,89 @@ async function exportAnbauteilePDF(entry){
     await p.addSVGSketch(sketchKey,cardY,cardH);
     p.y+=cardH+4;
   }
-  await p.addPhotos(entry.photos);
+  const _atPhotos=await loadPhotosFromIDB(entry.photos||[]);
+  await p.addPhotos(_atPhotos);
   p.footer('Anbauteile');
   p.doc.save('NeziDesk_Anbauteile_'+(entry.kunde||'').replace(/\s/g,'_')+'_'+(entry.datum||'').replace(/-/g,'')+'.pdf');
+}
+
+// ── EXPORT ERSATZTEILE PDF ───────────────────────────────
+async function exportErsatzteilePDF(entry){
+  const p=makePDFDoc();
+  const pCol={'Dringend – sofort':[220,38,38],'Hoch – diese Woche':[180,83,9],'Normal – nächster Service':[0,0,160],'Niedrig – beobachten':[100,110,130]};
+  const pRgb=pCol[entry.prioritaet]||[0,0,160];
+
+  p.pageHeader('Ersatzteile',
+    'NeziMont GmbH'+(entry.kunde?' · '+entry.kunde:'')+(entry.reihe?' · Reihe '+entry.reihe:'')+(entry.datum?' · '+entry.datum:''),
+    entry.erfasser||'');
+
+  // Standort + Priorität
+  p.sh('Standort & Priorität');
+  const sH=28;p.guard(sH+4);
+  p.doc.setFillColor(248,250,252);p.doc.rect(p.ml,p.y,p.cw,sH,'F');
+  p.doc.setFillColor(...pRgb);p.doc.rect(p.ml,p.y,2,sH,'F');
+  p.doc.setDrawColor(200,210,220);p.doc.setLineWidth(0.3);p.doc.rect(p.ml,p.y,p.cw,sH,'S');
+  const sFields=[{l:'Kunde',v:entry.kunde},{l:'Reihe',v:entry.reihe},{l:'Datum',v:entry.datum},{l:'Erfasser',v:entry.erfasser},{l:'Priorität',v:entry.prioritaet||'—'}];
+  const sColW=p.cw/sFields.length;
+  sFields.forEach(({l,v},i)=>{
+    const x=p.ml+5+i*sColW;
+    p.doc.setTextColor(110,120,140);p.doc.setFontSize(5.5);p.doc.setFont('helvetica','bold');p.doc.text(l.toUpperCase(),x,p.y+7);
+    p.doc.setTextColor(20,25,40);p.doc.setFontSize(8);p.doc.setFont('helvetica','normal');p.doc.text(String(v||'—'),x,p.y+15);
+  });
+  p.y+=sH+4;
+
+  // Positionen
+  p.sh('Positionen ('+( entry.items||[]).length+')');
+  for(const item of (entry.items||[])){
+    const isStrebe=item.typ==='Diagonalstrebe'||item.typ==='Horizontalstrebe';
+    const etSkKey=item.typ==='Traverse'?'Traverse':item.typ==='Stützenrahmen'?'Stützenrahmen':item.typ==='Einzelstütze'?'Einzelstütze':item.typ==='Diagonalstrebe'?'Diagonalstrebe':item.typ==='Horizontalstrebe'?'Horizontalstrebe':item.typ==='Kleinteile'?'Kleinteile':null;
+    const hasSk=!!etSkKey;
+    const fields=[
+      {l:'Stückzahl',v:(item.anzahl||1)+' Stk.'},
+      {l:'Hersteller',v:item.hersteller||'—'},
+      {l:'Masse / Typ',v:item.masse||'—'},
+    ];
+    if(isStrebe){
+      if(item.laenge) fields.push({l:'Länge',v:item.laenge+' mm'});
+      if(item.breite) fields.push({l:'Breite',v:item.breite+' mm'});
+      if(item.hoehe)  fields.push({l:'Höhe',v:item.hoehe+' mm'});
+      if(item.lochmass) fields.push({l:'Lochmass',v:item.lochmass+' mm'});
+    }
+    const{cardY,cardH}=p.pdfCard(item.typ,fields,item.bemerkung||null,hasSk);
+    // Draw ET sketch on right half of card
+    if(hasSk&&ET_SKETCHES[etSkKey]){
+      try{
+        const svgStr=ET_SKETCHES[etSkKey]('pdf');
+        const blob=new Blob([svgStr],{type:'image/svg+xml'});
+        const url=URL.createObjectURL(blob);
+        await new Promise(res=>{
+          const img=new Image();
+          img.onload=()=>{
+            const cv=document.createElement('canvas');cv.width=420;cv.height=220;
+            const ctx2=cv.getContext('2d');ctx2.fillStyle='#f8fafc';ctx2.fillRect(0,0,420,220);
+            const iAR=img.naturalWidth/img.naturalHeight,cAR=420/220;
+            let dw,dh,dx,dy;
+            if(iAR>cAR){dw=420;dh=420/iAR;dx=0;dy=(220-dh)/2;}
+            else{dh=220;dw=220*iAR;dx=(420-dw)/2;dy=0;}
+            ctx2.drawImage(img,dx,dy,dw,dh);
+            try{p.doc.addImage(cv.toDataURL('image/png'),'PNG',p.ml+p.cw/2+2,cardY+2,p.cw/2-4,cardH-4);}catch(_){}
+            URL.revokeObjectURL(url);res();
+          };
+          img.onerror=()=>{URL.revokeObjectURL(url);res();};
+          img.src=url;
+        });
+      }catch(_){}
+    }
+    p.y+=cardH+4;
+  }
+
+  // Fotos
+  const photos=await loadPhotosFromIDB(entry.photos||[]);
+  await p.addPhotos(photos);
+
+  p.footer('Ersatzteile');
+  p.doc.save('NeziDesk_Ersatzteile_'+(entry.kunde||'').replace(/\s/g,'_')+'_'+(entry.datum||'').replace(/-/g,'')+'.pdf');
+  toast('PDF exportiert ✓');
 }
 
 // ── EXPORT PDF ────────────────────────────────────────────
@@ -3562,6 +3783,75 @@ async function buildPDF(list, filename, existingDoc, existingY){
     });
     y+=dH+4;
 
+    // ── Abschnitte ──
+    if(e.abschnitte&&e.abschnitte.length>0){
+      sh('Abschnitte');
+      e.abschnitte.forEach((sec,si)=>{
+        const isA=(sec.typ||'grund')==='anbau';
+        const sf=Math.max(parseInt(sec.felder)||0,0);
+        const eb=parseInt(sec.ebenen)||parseInt(e.ebenen)||0;
+        const secSt=si===0?sf+(isA?0:1):(sf+1);
+        const secTrv=sf*eb*2;
+        const aH=28+4;guard(aH+2);
+        doc.setFillColor(248,250,252);doc.rect(ml,y,cw,aH,'F');
+        doc.setDrawColor(isA?249:37,isA?115:99,isA?22:235);doc.setLineWidth(0.4);doc.rect(ml,y,2,aH,'F');
+        doc.setDrawColor(200,210,220);doc.setLineWidth(0.3);doc.rect(ml,y,cw,aH,'S');
+        doc.setTextColor(isA?180:0,isA?83:0,isA?9:160);doc.setFontSize(6.5);doc.setFont('helvetica','bold');
+        doc.text('ABSCHNITT '+(si+1)+' · '+(isA?'ANBAUFELD':'GRUNDFELD'),ml+5,y+7);
+        const aFields=[
+          {l:'Felder',v:sf||'—'},{l:'Ebenen',v:eb||'—'},
+          {l:'Feldweite',v:sec.breite?sec.breite+' mm':'—'},
+          {l:'Stützen',v:secSt+' Stk.'},{l:'Traversen',v:secTrv+' Stk.'},
+        ];
+        const aColW=(cw-10)/5;
+        aFields.forEach(({l,v},i)=>{
+          const x=ml+5+i*(aColW+2),yy=y+12;
+          doc.setTextColor(...SB);doc.setFontSize(5);doc.setFont('helvetica','bold');doc.text((l||'').toUpperCase(),x,yy);
+          doc.setTextColor(...TX);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text(String(v||'—'),x,yy+6);
+        });
+        y+=aH+3;
+      });
+    }
+
+    // ── Gesamtsystem ──
+    {
+      const totalF=(e.abschnitte&&e.abschnitte.length>0)
+        ?e.abschnitte.reduce((a,s)=>a+Math.max(parseInt(s.felder)||0,0),0)
+        :parseInt(e.felder)||0;
+      let stTotal=0,trvTotal=0;
+      if(e.abschnitte&&e.abschnitte.length>0){
+        e.abschnitte.forEach((sec,si)=>{
+          const sf=Math.max(parseInt(sec.felder)||0,0);
+          const eb=parseInt(sec.ebenen)||parseInt(e.ebenen)||0;
+          stTotal+=si===0?sf+((sec.typ||'grund')==='anbau'?0:1):(sf+1);
+          trvTotal+=sf*eb*2;
+        });
+      } else {
+        stTotal=totalF+(e.anbau==='ja'?0:1);
+        const eb0=parseInt(e.ebenen)||0;
+        trvTotal=totalF*eb0*2;
+      }
+      if(stTotal>0||trvTotal>0){
+        sh('Gesamtsystem');
+        const gH=28;guard(gH+4);
+        doc.setFillColor(232,240,255);doc.rect(ml,y,cw,gH,'F');
+        doc.setDrawColor(37,99,235);doc.setLineWidth(0.5);doc.rect(ml,y,cw,gH,'S');
+        doc.setFillColor(37,99,235);doc.rect(ml,y,2,gH,'F');
+        const gFields=[
+          {l:'Stützen Total',v:stTotal+' Stk.',c:[37,99,235]},
+          {l:'Traversen Total',v:trvTotal+' Stk.',c:[234,88,12]},
+          {l:'Felder Total',v:totalF||'—'},
+        ];
+        const gColW=cw/gFields.length;
+        gFields.forEach(({l,v,c},i)=>{
+          const x=ml+5+i*gColW,yy=y+8;
+          doc.setTextColor(...SB);doc.setFontSize(5.5);doc.setFont('helvetica','bold');doc.text(l.toUpperCase(),x,yy);
+          doc.setTextColor(...(c||TX));doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text(String(v),x,yy+9);
+        });
+        y+=gH+4;
+      }
+    }
+
     // ── Profil & Bemerkungen ──
     if(e.profiles?.stuetze?.breite||e.profiles?.traverse?.hoehe){
       sh('Profilmasse');
@@ -3631,8 +3921,15 @@ async function exportSammelPDF(){
   });
   if(!selected.length){toast('Keine Positionen gewählt','#dc2626');return;}
   toast('PDF wird erstellt...','#0000cd');
-  await buildPDF(selected,'NeziMont_Sammel_'+new Date().toISOString().split('T')[0]+'.pdf');
-  toast('Sammel-PDF exportiert ✓');
+  try{
+    const resolved=await Promise.all(selected.map(async e=>{
+      const c=JSON.parse(JSON.stringify(e));
+      c.photos=await loadPhotosFromIDB(c.photos||[]);
+      return c;
+    }));
+    await buildPDF(resolved,'NeziMont_Sammel_'+new Date().toISOString().split('T')[0]+'.pdf');
+    toast('Sammel-PDF exportiert ✓');
+  }catch(err){toast('PDF Fehler: '+err.message,'#dc2626');console.error(err);}
 }
 
 renderList();
@@ -3729,10 +4026,10 @@ function addAbschnitt(){
     const ebenen = gv('f-ebenen')||'';
     const breite = gv('f-breite')||'';
     if(felder){
-      regalAbschnitte.push({id:uid(), trenngrund:'Anfang', felder, ebenen, breite, bemerkung:''});
+      regalAbschnitte.push({id:uid(), trenngrund:'Anfang', typ:'grund', felder, ebenen, breite, bemerkung:''});
     }
   }
-  regalAbschnitte.push({id:uid(), trenngrund:trenn, felder:'', ebenen:gv('f-ebenen')||'', breite:gv('f-breite')||'', bemerkung:''});
+  regalAbschnitte.push({id:uid(), trenngrund:trenn, typ:'grund', felder:'', ebenen:gv('f-ebenen')||'', breite:gv('f-breite')||'', bemerkung:''});
   renderAbschnitte();
   updateFieldCards();
   setTimeout(()=>{applyRegelm();updateSketch();},50);
@@ -3745,6 +4042,22 @@ function removeAbschnitt(id){
   updateFieldCards();
   setTimeout(()=>{applyRegelm();updateSketch();},50);
   setTimeout(updateSketch,200);
+}
+
+function abschnittTyp(id, typ){
+  const a=regalAbschnitte.find(x=>x.id===id);
+  if(!a) return;
+  a.typ=typ;
+  // Update button styles
+  const g=document.getElementById('at-grund-'+id);
+  const n=document.getElementById('at-anbau-'+id);
+  if(g){g.style.borderColor=typ==='grund'?'var(--accent)':'var(--border)';g.style.color=typ==='grund'?'var(--accent)':'var(--sub)';g.style.background=typ==='grund'?'rgba(37,99,235,0.08)':'var(--bg2)';}
+  if(n){n.style.borderColor=typ==='anbau'?'#f97316':'var(--border)';n.style.color=typ==='anbau'?'#f97316':'var(--sub)';n.style.background=typ==='anbau'?'rgba(249,115,22,0.08)':'var(--bg2)';}
+  calcGesamtsystem();
+  // Force full sketch redraw so isAnbau flag is re-evaluated
+  drawSketchOnCanvas('regal-sketch');
+  if(document.getElementById('regal-sketch-overlay')?.offsetParent)
+    drawSketchOnCanvas('regal-sketch-overlay');
 }
 
 function abschnittInput(el){
@@ -3769,6 +4082,10 @@ function renderAbschnitte(){
           <span style="font-size:12px;font-weight:700;color:var(--accent)">${trennIcons[a.trenngrund]||'▶'} Abschnitt ${i+1}</span>
           <span style="font-size:11px;color:var(--sub);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 8px">${a.trenngrund}</span>
           <button onclick="removeAbschnitt('${a.id}')" style="border:none;background:transparent;color:var(--red);font-size:16px;cursor:pointer;padding:0;margin-left:auto">×</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <button id="at-grund-${a.id}" onclick="abschnittTyp('${a.id}','grund')" style="flex:1;padding:5px 8px;font-size:11px;font-weight:600;border:1.5px solid ${(a.typ||'grund')==='grund'?'var(--accent)':'var(--border)'};border-radius:7px;background:${(a.typ||'grund')==='grund'?'rgba(37,99,235,0.08)':'var(--bg2)'};color:${(a.typ||'grund')==='grund'?'var(--accent)':'var(--sub)'};cursor:pointer">▶ Grundfeld</button>
+          <button id="at-anbau-${a.id}" onclick="abschnittTyp('${a.id}','anbau')" style="flex:1;padding:5px 8px;font-size:11px;font-weight:600;border:1.5px solid ${a.typ==='anbau'?'#f97316':'var(--border)'};border-radius:7px;background:${a.typ==='anbau'?'rgba(249,115,22,0.08)':'var(--bg2)'};color:${a.typ==='anbau'?'#f97316':'var(--sub)'};cursor:pointer">⟂ Anbaufeld</button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
           <div class="field" style="margin-bottom:0"><label>Felder</label>
@@ -3922,9 +4239,30 @@ function drawSketchOnCanvas(canvasId){
   } else {
     drawRegal(ctx,felder,ebenen,fd,toggleState.anbau==='ja',W,H);
   }
+
+  // ── Badges oben rechts: Stützen + Traversen nebeneinander ──
+  const _isA=toggleState.anbau==='ja';
+  const _stN=felder+(_isA?0:1);
+  const _tc=_isA?'#ea580c':'#1e40af';
+  let _trvN=0;
+  for(let i=0;i<felder;i++){_trvN+=(parseInt(document.getElementById('eb-'+i)?.value)||ebenen||0)*2;}
+  const _bSt='🔵 '+_stN+' Stützen';
+  const _bTrv='🟠 '+_trvN+' Traversen';
+  ctx.font='bold 8px Inter,Arial,sans-serif';
+  const _bwSt=ctx.measureText(_bSt).width+8;
+  const _bwTrv=ctx.measureText(_bTrv).width+8;
+  const _bxTrv=W-_bwTrv-4;
+  const _bxSt=_bxTrv-_bwSt-4;
+  ctx.fillStyle='rgba(255,255,255,0.90)';ctx.fillRect(_bxSt,6,_bwSt,14);
+  ctx.strokeStyle=_tc;ctx.lineWidth=1;ctx.strokeRect(_bxSt,6,_bwSt,14);
+  ctx.fillStyle='#1e3a8a';ctx.textAlign='right';ctx.fillText(_bSt,_bxSt+_bwSt-2,16);
+  ctx.fillStyle='rgba(255,255,255,0.90)';ctx.fillRect(_bxTrv,6,_bwTrv,14);
+  ctx.strokeStyle='#f97316';ctx.lineWidth=1;ctx.strokeRect(_bxTrv,6,_bwTrv,14);
+  ctx.fillStyle='#c2410c';ctx.textAlign='right';ctx.fillText(_bTrv,_bxTrv+_bwTrv-2,16);
+  ctx.textAlign='left';
 }
 
-function drawRegal2D(ctx,felder,ebenen,fd,W,H){
+function drawRegal2D(ctx,felder,ebenen,fd,W,H,isAnbau){
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#f0f4f8';ctx.fillRect(0,0,W,H);
   const PL=36,PR=16,PT=24,PB=24;
@@ -3938,6 +4276,14 @@ function drawRegal2D(ctx,felder,ebenen,fd,W,H){
 
   // Ständer
   for(let s=0;s<=felder;s++){
+    if(isAnbau&&s===0){
+      // Anbaufeld: linke Stütze gestrichelt/halb andeuten
+      ctx.setLineDash([3,2]);
+      ctx.strokeStyle='#93c5fd';ctx.lineWidth=1.5;
+      ctx.strokeRect(PL+fx_[s]-UW/2,PT,UW,rH);
+      ctx.setLineDash([]);
+      continue;
+    }
     ctx.fillStyle='#1a3a8f';
     ctx.fillRect(PL+fx_[s]-UW/2,PT,UW,rH);
     // Lochprofil
@@ -3991,16 +4337,36 @@ function drawRegal2D(ctx,felder,ebenen,fd,W,H){
         ctx.fillRect(PL+fx_[f]+UW/2,ey+3,fw[f]-UW,2);
       }
     });
-    // LH labels on left side of first field
-    if(f===0){
-      ctx.font='bold 7px JetBrains Mono,monospace';
-      ctx.textAlign='right';
-      for(let e=0;e<fe;e++){
-        const midY=PT+(fy2_[e]+fy2_[e+1])/2;
-        const lhVal=fLHraw[e]?Math.round(fLHraw[e])+'mm':'LH'+(fe-e);
-        ctx.fillStyle='rgba(100,116,139,0.7)';
-        ctx.fillText(lhVal,PL-3,midY+3);
-      }
+    // LH labels: centered inside each Fach (between traverse top and next traverse top)
+    for(let e=0;e<fe;e++){
+      // Top of fach = traverse at fy2_[e], bottom = traverse at fy2_[e+1]
+      // Visual fach goes from just below traverse to just above next traverse
+      const fachTop=PT+(fe===1?rH/2:fy2_[e])+TH;
+      const fachBot=fe===1?PT+rH:PT+fy2_[e+1];
+      const fachmidY=(fachTop+fachBot)/2;
+      const lhVal=fLHraw[e]?Math.round(fLHraw[e])+'':('LH'+(fe-e));
+      const lhUnit=fLHraw[e]?' mm':'';
+      const midX=PL+(fx_[f]+fx_[f+1])/2;
+      ctx.font='bold 7px Inter,Arial,sans-serif';
+      ctx.textAlign='center';
+      ctx.fillStyle='rgba(71,85,105,0.55)';
+      ctx.fillText(lhVal+lhUnit, midX, fachmidY+3);
+    }
+    ctx.textAlign='left';
+
+    // Lichtweite label – bottom of each field
+    const lwVal=parseFloat((fd.lichtweiten||[])[f])||0;
+    if(lwVal>0){
+      const lwTxt=Math.round(lwVal)+' mm';
+      ctx.font='bold 7px Inter,Arial,sans-serif';
+      const tw=ctx.measureText(lwTxt).width;
+      const midX=PL+(fx_[f]+fx_[f+1])/2;
+      const botY=PT+rH+14;
+      ctx.fillStyle='rgba(30,64,175,0.15)';
+      ctx.fillRect(midX-tw/2-4,botY-8,tw+8,11);
+      ctx.fillStyle='#1e40af';
+      ctx.textAlign='center';
+      ctx.fillText(lwTxt,midX,botY);
       ctx.textAlign='left';
     }
   }
@@ -4055,8 +4421,10 @@ function drawRegal2D(ctx,felder,ebenen,fd,W,H){
   ctx.font='bold 8px Inter,Arial,sans-serif';ctx.textAlign='center';ctx.fillStyle='rgba(37,99,235,0.65)';
   for(let f=0;f<felder;f++) ctx.fillText('F'+(f+1),PL+(fx_[f]+fx_[f+1])/2,PT+rH+16);
   ctx.textAlign='left';
+  // Feldinfo oben links
+  const _stLabel=felder+(felder>1?' Felder':' Feld')+'  '+ebenen+(ebenen>1?' Ebenen':' Ebene');
   ctx.fillStyle='#334155';ctx.font='bold 8px JetBrains Mono,monospace';
-  ctx.fillText(felder+(felder>1?' Felder':' Feld')+'  '+ebenen+(ebenen>1?' Ebenen':' Ebene'),PL,PT-8);
+  ctx.fillText(_stLabel,PL,PT-8);
 }
 
 function updateSketch(){
@@ -4099,9 +4467,36 @@ function drawRegalMitAbschnitten(ctx,W,H){
       dsvVon:slice(fdAll.dsvVon),
       dsvBis:slice(fdAll.dsvBis),
     };
+    // Stützen für diesen Abschnitt
+    const _secStCount=gi===0?(felder+((sec.typ||'grund')==='anbau'?0:1)):(felder+1);
+    const _isAnbau=(sec.typ||'grund')==='anbau';
+    const _typColor=_isAnbau?'#ea580c':'#1e40af';
+
     ctx.save();ctx.translate(gx,0);ctx.beginPath();ctx.rect(0,0,gw,H);ctx.clip();
-    if(sketchViewMode==='2d'){drawRegal2D(ctx,felder,ebenen,fdSec,gw,H);}else{drawRegal(ctx,felder,ebenen,fdSec,false,gw,H,fieldOffset);}
+    if(sketchViewMode==='2d'){drawRegal2D(ctx,felder,ebenen,fdSec,gw,H,_isAnbau&&gi===0);}else{drawRegal(ctx,felder,ebenen,fdSec,_isAnbau&&gi===0,gw,H,fieldOffset);}
     ctx.restore();
+
+    // ── Badges oben rechts im Abschnitt – nebeneinander ──
+    const _secEb=Math.max(parseInt(sec.ebenen)||parseInt(gv('f-ebenen'))||0,0);
+    const _secTrv=felder*_secEb*2;
+    const _badgeSt='🔵 '+_secStCount;
+    const _badgeTrv='🟠 '+_secTrv;
+    ctx.font='bold 8px Inter,Arial,sans-serif';
+    const _bwSt=ctx.measureText(_badgeSt).width+8;
+    const _bwTrv=ctx.measureText(_badgeTrv).width+8;
+    const _gap=4;
+    const _bxTrv=gx+gw-_bwTrv-4;
+    const _bxSt=_bxTrv-_bwSt-_gap;
+    // Stützen badge
+    ctx.fillStyle='rgba(255,255,255,0.90)';ctx.fillRect(_bxSt,6,_bwSt,14);
+    ctx.strokeStyle=_typColor;ctx.lineWidth=1;ctx.strokeRect(_bxSt,6,_bwSt,14);
+    ctx.fillStyle='#1e3a8a';ctx.textAlign='right';ctx.fillText(_badgeSt,_bxSt+_bwSt-2,16);
+    // Traversen badge
+    ctx.fillStyle='rgba(255,255,255,0.90)';ctx.fillRect(_bxTrv,6,_bwTrv,14);
+    ctx.strokeStyle='#f97316';ctx.lineWidth=1;ctx.strokeRect(_bxTrv,6,_bwTrv,14);
+    ctx.fillStyle='#c2410c';ctx.textAlign='right';ctx.fillText(_badgeTrv,_bxTrv+_bwTrv-2,16);
+    ctx.textAlign='left';
+
     fieldOffset+=felder;
     // Separator
     if(gi<ng-1){
@@ -4127,6 +4522,7 @@ function drawRegalMitAbschnitten(ctx,W,H){
     }
     gx+=gw+SEP;
   });
+
 }
 
 // drawFieldLabels removed – labels now drawn inside drawRegal
@@ -4759,5 +5155,59 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+
+<!-- GRUNDRISSPLANER -->
+<div class="screen" id="screen-grundriss">
+  <div class="form-header">
+    <button class="back-btn" onclick="showScreen('list')">← Zurück</button>
+    <span style="font-size:15px;font-weight:700">Grundrissplaner</span>
+    <button onclick="exportGrundrissAsPDF()" style="border:none;background:transparent;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:4px 8px">⬇ PDF</button>
+  </div>
+
+  <!-- Raum-Einstellungen -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+      <div class="field" style="margin:0;flex:1;min-width:100px">
+        <label>Raumbreite (mm)</label>
+        <input type="number" id="gr-room-w" value="10000" placeholder="z.B. 10000" oninput="renderGrundriss()">
+      </div>
+      <div class="field" style="margin:0;flex:1;min-width:100px">
+        <label>Raumtiefe (mm)</label>
+        <input type="number" id="gr-room-d" value="8000" placeholder="z.B. 8000" oninput="renderGrundriss()">
+      </div>
+      <div class="field" style="margin:0;flex:1;min-width:80px">
+        <label>Raster (mm)</label>
+        <select id="gr-snap" onchange="renderGrundriss()" style="border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);padding:8px 10px;font-size:14px;font-family:inherit;width:100%">
+          <option value="0">Kein Raster</option>
+          <option value="100">100 mm</option>
+          <option value="250" selected>250 mm</option>
+          <option value="500">500 mm</option>
+          <option value="1000">1000 mm</option>
+        </select>
+      </div>
+      <button onclick="resetGrundriss()" style="border:1.5px solid var(--border);background:var(--bg2);color:var(--sub);border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- Hauptbereich: Palette + Canvas -->
+  <div style="display:flex;gap:12px;align-items:flex-start">
+
+    <!-- Regal-Palette links -->
+    <div style="width:160px;flex-shrink:0">
+      <div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.06em;margin-bottom:8px">REGALE ZIEHEN</div>
+      <div id="gr-palette" style="display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 260px);overflow-y:auto"></div>
+    </div>
+
+    <!-- Canvas -->
+    <div style="flex:1;overflow:auto">
+      <canvas id="gr-canvas" style="display:block;border:1.5px solid var(--border);border-radius:10px;cursor:crosshair;touch-action:none"></canvas>
+      <div style="font-size:10px;color:var(--sub);margin-top:4px;text-align:center">Massstab 1:50 · Grau = Raster · Klick auf Regal = auswählen · Entf = löschen</div>
+    </div>
+  </div>
+
+  <!-- Info-Leiste -->
+  <div id="gr-info" style="margin-top:8px;font-size:11px;color:var(--sub);min-height:16px"></div>
+</div>
+
 </body>
 </html>
